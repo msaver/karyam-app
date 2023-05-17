@@ -26,7 +26,7 @@ class CategoryItemWidget extends StatelessWidget {
           ),
           Text(category.name, style: TextStyle(fontSize: 16,)),
           const Spacer(),
-          Container(
+          if(category.count != 0) Container(
             height: 32,
             width: 40,
             padding: const EdgeInsets.all(6),

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:msaver/widget/primary_button.dart';
 
@@ -13,15 +11,21 @@ class NewTaskWidget extends StatelessWidget {
         height: double.infinity,
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),
-        decoration:
-            BoxDecoration(color: Colors.grey.shade200.withOpacity(0.9)),
+        decoration: BoxDecoration(color: Colors.grey.shade200.withOpacity(0.9)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(
               height: 32,
             ),
-            IconButton(onPressed: (){}, icon: Icon(Icons.close, color: Colors.grey[600],)),
+            IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.grey[600],
+                )),
             const SizedBox(
               height: 32,
             ),
@@ -37,9 +41,6 @@ class NewTaskWidget extends StatelessWidget {
                     fontSize: 24,
                   )),
             ),
-
-
-
             const SizedBox(
               width: double.infinity,
               height: 54,

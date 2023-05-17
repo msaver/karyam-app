@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:msaver/data/category/category.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:msaver/screen/home/viewmodel/home_viewmodel.dart';
 
 class CreateCategoryItemWidget extends StatefulWidget {
-  const CreateCategoryItemWidget({
+  final HomeViewModel model;
+  const CreateCategoryItemWidget(this.model, {
     Key? key,
   }) : super(key: key);
 
@@ -13,6 +15,8 @@ class CreateCategoryItemWidget extends StatefulWidget {
 
 class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
   bool isNewItemCreate = false;
+  Color selectedColor = Color(0xff000000);
+  TextEditingController categoryEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -31,15 +35,15 @@ class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
         child: !isNewItemCreate
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
+                children: [
                   Icon(
                     Icons.add,
-                    color: Colors.black,
+                    color: selectedColor,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 24,
                   ),
-                  Text("Create List",
+                  const Text("Create List",
                       style: TextStyle(
                         fontSize: 16,
                       )),
@@ -54,9 +58,52 @@ class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
     return  Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Icon(
-          Icons.crop_square,
-          color: Colors.black,
+        Container(
+          padding: const EdgeInsets.only(left: 4, right: 4, top: 2, bottom: 2),
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+          color: Colors.grey[300],
+          ),
+          child: InkWell(
+            onTap: (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    titlePadding: const EdgeInsets.all(0),
+                    contentPadding: const EdgeInsets.all(0),
+                    content: SingleChildScrollView(
+                      child: MaterialPicker(
+                        pickerColor: Colors.black,
+                        onColorChanged: (value){
+                          print(value);
+                          Navigator.pop(context);
+                          setState(() {
+                            selectedColor = value;
+                          });
+                        },
+                        enableLabel: true,
+                        portraitOnly: true,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+            child: Row(
+              children: [
+                Icon(
+                  Icons.crop_square,
+                  color: selectedColor,
+                ),
+                const SizedBox(width: 2),
+                const Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Colors.black,
+                ),
+              ],
+            ),
+          ),
         ),
         const SizedBox(
           width: 24,
@@ -64,7 +111,9 @@ class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
         Expanded(
           child: TextFormField(
             textInputAction: TextInputAction.done,
+            controller: categoryEditingController,
             onEditingComplete: (){
+              widget.model.addNewCategory(categoryEditingController.text, selectedColor);
               setState(() {
                 isNewItemCreate = false;
               });

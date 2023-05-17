@@ -5,7 +5,7 @@ part 'category.g.dart';
 class _Category{
 
   @PrimaryKey()
-  late int id;
+  late ObjectId id;
 
   late String name;
 
