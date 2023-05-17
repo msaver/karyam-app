@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:msaver/data/category/category.dart';
 import 'package:msaver/screen/new_task_screen/new_task_screen.dart';
+import 'package:msaver/widget/category_item_widget.dart';
+import 'package:msaver/widget/create_category_item_widget.dart';
 import 'package:msaver/widget/new_task_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,40 +24,44 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.white,
           child: Column(
             children: [
-              SizedBox(height: 64,),
-              Container(
-                color: Colors.redAccent,
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(Icons.home_filled,),
-                    SizedBox(width: 24,),
-                    Text("Home", style: TextStyle(fontSize: 16)),
-                    Container(
-                      child: Text("12"),
-                    )
-                  ],
+              const SizedBox(
+                height: 64,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: ListView(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      CategoryItemWidget(isSelected: true, category: Category("Home",0xFF177e89, 12 )),
+                      CategoryItemWidget(isSelected: false, category: Category("Personal",0xFFDB8480, 8 )),
+                      CategoryItemWidget(isSelected: true, category: Category("Work",0xFF335C67, 4 )),
+                      CategoryItemWidget(isSelected: false, category: Category("Complete",0xCB5959FF, 1 )),
+                      CreateCategoryItemWidget()
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
         ),
       ),
+      appBar: AppBar(
+        elevation: 12,
+        title: const Text("M.Saver"),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: RefreshIndicator(
           onRefresh: () async {
-            // setState(() {
-            //   isNewTaskWidgetVisible = false;
-            // });
-
             await Navigator.push(
               context,
               PageRouteBuilder(
                 pageBuilder: (_, __, ___) => const NewTaskWidget(),
                 transitionDuration: const Duration(milliseconds: 200),
-                transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                transitionsBuilder: (_, a, __, c) =>
+                    FadeTransition(opacity: a, child: c),
               ),
             );
           },
@@ -63,29 +70,17 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Stack(
             children: [
               ListView(),
-              SizedBox(
+              const SizedBox(
                 height: double.infinity,
                 width: double.infinity,
                 child: Column(
-                  children: const [
+                  children: [
                     SizedBox(
                       height: 54,
-                    ),
-                    Text(
-                      "MSaver",
-                      style: TextStyle(
-                          fontSize: 36,
-                          color: Colors.redAccent,
-                          fontWeight: FontWeight.w400),
                     ),
                   ],
                 ),
               ),
-              //  AnimatedOpacity(
-              //   opacity: isNewTaskWidgetVisible ? 1.0 : 0.0,
-              //   duration: Duration(milliseconds: 200),
-              //   child: NewTaskWidget(),
-              // )
             ],
           ),
         ),
