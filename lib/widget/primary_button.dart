@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 
 class PrimaryButton extends StatelessWidget {
-  const PrimaryButton({Key? key}) : super(key: key);
+  final Function() onPressed;
+  final String text;
+  const PrimaryButton({Key? key, required this.text, required this.onPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
-      child: const Text(
-        "Add Task",
-        style: TextStyle(fontSize: 16),
+      onPressed: () {
+        onPressed.call();
+      },
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 16),
       ),
     );
   }

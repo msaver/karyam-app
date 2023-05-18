@@ -14,3 +14,21 @@ class _Category{
   late int count;
 
 }
+
+@RealmModel()
+class _Task {
+
+  @PrimaryKey()
+  late ObjectId id;
+
+  late String taskName;
+
+  late _Category? category;
+
+  late DateTime createdDate;
+
+  late DateTime tobeDoneDate;
+
+  late bool isCompleted = false;
+
+}

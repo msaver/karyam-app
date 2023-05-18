@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:msaver/routes/routes.dart';
-import 'package:msaver/screen/home/home_screen.dart';
+
 import 'color_schemes.g.dart';
 
 void main() {

@@ -15,7 +15,7 @@ class CreateCategoryItemWidget extends StatefulWidget {
 
 class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
   bool isNewItemCreate = false;
-  Color selectedColor = Color(0xff000000);
+  Color selectedColor = const Color(0xff000000);
   TextEditingController categoryEditingController = TextEditingController();
 
   @override
