@@ -12,7 +12,7 @@ class CategoryItemWidget extends StatelessWidget {
       padding: const EdgeInsets.only(
           left: 32.0, right: 32.0, bottom: 16.0, top: 16.0),
       decoration: BoxDecoration(
-          color: isSelected ? Colors.grey[100] : Colors.white,
+          color: isSelected ? Colors.grey[100] : Theme.of(context).scaffoldBackgroundColor,
           borderRadius: const BorderRadius.all(Radius.circular(6))),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -26,14 +26,14 @@ class CategoryItemWidget extends StatelessWidget {
           ),
           Text(category.name, style: TextStyle(fontSize: 16,)),
           const Spacer(),
-          if(category.count != 0) Container(
+          if(category.pendingCount != 0) Container(
             height: 32,
             width: 40,
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color:Theme.of(context).colorScheme.onSecondary,
                 borderRadius: const BorderRadius.all(Radius.circular(4))),
-            child: Center(child: Text("${category.count}")),
+            child: Center(child: Text("${category.pendingCount}")),
           )
         ],
       ),

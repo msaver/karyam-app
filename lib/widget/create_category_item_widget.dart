@@ -15,7 +15,7 @@ class CreateCategoryItemWidget extends StatefulWidget {
 
 class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
   bool isNewItemCreate = false;
-  Color selectedColor = const Color(0xff000000);
+  Color selectedColor = const Color(0xff938989);
   TextEditingController categoryEditingController = TextEditingController();
 
   @override
@@ -23,9 +23,9 @@ class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
     return Container(
       padding: const EdgeInsets.only(
           left: 32.0, right: 32.0, bottom: 16.0, top: 16.0),
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(6))),
+      decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.all(Radius.circular(6))),
       child: InkWell(
         onTap: () {
           setState(() {
@@ -62,7 +62,7 @@ class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
           padding: const EdgeInsets.only(left: 4, right: 4, top: 2, bottom: 2),
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(Radius.circular(8)),
-          color: Colors.grey[300],
+          color: Theme.of(context).primaryColorLight,
           ),
           child: InkWell(
             onTap: (){

@@ -6,15 +6,18 @@ import 'package:realm/realm.dart';
 class HomeViewModel extends ChangeNotifier {
   late Realm realm;
   List<Category> categories = [];
+
   List<Task> tasks = [];
   Category? _selectedCategory;
   DateTime _selectedDateTime = DateTime.now();
   String? dateType;
   TextEditingController taskEditingController = TextEditingController();
+  int totalTask = 0;
+  int completeTask = 0;
 
   HomeViewModel() {
     var config = Configuration.local([Task.schema, Category.schema],
-        initialDataCallback: (realm) {
+        schemaVersion: 1, initialDataCallback: (realm) {
       realm.addAll<Category>([
         Category(
           ObjectId(),
@@ -34,16 +37,10 @@ class HomeViewModel extends ChangeNotifier {
           0xFF335C67,
           0,
         ),
-        Category(
-          ObjectId(),
-          "Complete",
-          0xCB5959FF,
-          0,
-        )
       ]);
     });
     realm = Realm(config);
-    getAllCategory();
+    updateCategoryValues();
     getAllTask();
   }
 
@@ -51,6 +48,19 @@ class HomeViewModel extends ChangeNotifier {
     this.categories.clear();
     List<Category> categories = realm.all<Category>().toList();
     this.categories.addAll(categories);
+    for (var element in categories) {
+      List<Task> totalTasks = realm
+          .all<Task>()
+          .query(r'category.name == $0', [element.name]).toList();
+      List<Task> pendingTasks = realm.all<Task>().query(
+          r'isCompleted == $0 && category.name == $1',
+          [false, element.name]).toList();
+      realm.write(() {
+        element.pendingCount = pendingTasks.length;
+        element.totalCount = totalTasks.length;
+      });
+    }
+    this.categories.add(Category(ObjectId(), "Completed", 0xCB5959FF, totalTask, pendingCount: completeTask));
     selectedCategory = this.categories[0];
   }
 
@@ -98,7 +108,7 @@ class HomeViewModel extends ChangeNotifier {
     Task task = Task(ObjectId(), taskName, DateTime.now(), selectedDateTime,
         category: selectedCategory);
     realm.write(() => realm.add(task));
-    realm.close();
+    // realm.close();
   }
 
   void getAllTask() {
@@ -119,6 +129,13 @@ class HomeViewModel extends ChangeNotifier {
     Task taskNewValue = realm.all<Task>().query(r'id == $0', [task.id]).first;
     tasks[tasks.indexWhere((element) => element.id == taskNewValue.id)] =
         taskNewValue;
+    updateCategoryValues();
     notifyListeners();
+  }
+
+  void updateCategoryValues() {
+    totalTask = realm.all<Task>().toList().length;
+    completeTask = realm.all<Task>().query(r'isCompleted == $0', [true]).toList().length;
+    getAllCategory();
   }
 }

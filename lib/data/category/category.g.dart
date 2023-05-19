@@ -8,16 +8,25 @@ part of 'category.dart';
 
 class Category extends _Category
     with RealmEntity, RealmObjectBase, RealmObject {
+  static var _defaultsSet = false;
+
   Category(
     ObjectId id,
     String name,
     int colorCode,
-    int count,
-  ) {
+    int totalCount, {
+    int pendingCount = 0,
+  }) {
+    if (!_defaultsSet) {
+      _defaultsSet = RealmObjectBase.setDefaults<Category>({
+        'pendingCount': 0,
+      });
+    }
     RealmObjectBase.set(this, 'id', id);
     RealmObjectBase.set(this, 'name', name);
     RealmObjectBase.set(this, 'colorCode', colorCode);
-    RealmObjectBase.set(this, 'count', count);
+    RealmObjectBase.set(this, 'totalCount', totalCount);
+    RealmObjectBase.set(this, 'pendingCount', pendingCount);
   }
 
   Category._();
@@ -38,9 +47,15 @@ class Category extends _Category
   set colorCode(int value) => RealmObjectBase.set(this, 'colorCode', value);
 
   @override
-  int get count => RealmObjectBase.get<int>(this, 'count') as int;
+  int get totalCount => RealmObjectBase.get<int>(this, 'totalCount') as int;
   @override
-  set count(int value) => RealmObjectBase.set(this, 'count', value);
+  set totalCount(int value) => RealmObjectBase.set(this, 'totalCount', value);
+
+  @override
+  int get pendingCount => RealmObjectBase.get<int>(this, 'pendingCount') as int;
+  @override
+  set pendingCount(int value) =>
+      RealmObjectBase.set(this, 'pendingCount', value);
 
   @override
   Stream<RealmObjectChanges<Category>> get changes =>
@@ -57,7 +72,8 @@ class Category extends _Category
       SchemaProperty('id', RealmPropertyType.objectid, primaryKey: true),
       SchemaProperty('name', RealmPropertyType.string),
       SchemaProperty('colorCode', RealmPropertyType.int),
-      SchemaProperty('count', RealmPropertyType.int),
+      SchemaProperty('totalCount', RealmPropertyType.int),
+      SchemaProperty('pendingCount', RealmPropertyType.int),
     ]);
   }
 }

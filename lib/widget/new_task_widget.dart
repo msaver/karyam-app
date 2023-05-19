@@ -72,7 +72,7 @@ class NewTaskWidget extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                               border: Border.all(
-                                  color: Theme.of(context).primaryColor),
+                                  color: Theme.of(context).colorScheme.primary),
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(12))),
                           padding: const EdgeInsets.only(
@@ -113,7 +113,7 @@ class NewTaskWidget extends StatelessWidget {
                                     ),
                                   ),
                                   ListView.builder(
-                                    itemCount: model.categories.length,
+                                    itemCount: model.categories.length-1,
                                     shrinkWrap: true,
                                     itemBuilder:
                                         (BuildContext context, int index) {
@@ -148,7 +148,7 @@ class NewTaskWidget extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                               border: Border.all(
-                                  color: Theme.of(context).primaryColor),
+                                  color: Theme.of(context).colorScheme.primary),
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(12))),
                           padding: const EdgeInsets.only(
@@ -181,8 +181,12 @@ class NewTaskWidget extends StatelessWidget {
                         height: 54,
                         child: PrimaryButton(
                           text: "Add Task",
-                          onPressed: () {
-                            model.addTask(model.taskEditingController.text, model.selectedCategory, model.selectedDateTime);
+                          onPressed: () async{
+                            model.addTask(model.taskEditingController.text,
+                                model.selectedCategory, model.selectedDateTime);
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            await Future.delayed(const Duration(milliseconds: 100));
+
                             Navigator.pop(context);
                           },
                         ),
