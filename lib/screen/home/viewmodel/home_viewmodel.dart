@@ -1,73 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:msaver/data/category/category.dart';
+import 'package:msaver/data/db_repo_impl.dart';
 import 'package:realm/realm.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  late Realm realm;
   List<Category> categories = [];
-
+  DbRepoImpl? _dbRepoImpl;
   List<Task> tasks = [];
   Category? _selectedCategory;
   DateTime _selectedDateTime = DateTime.now();
-  String? dateType;
   TextEditingController taskEditingController = TextEditingController();
-  int totalTask = 0;
-  int completeTask = 0;
 
   HomeViewModel() {
-    var config = Configuration.local([Task.schema, Category.schema],
-        schemaVersion: 1, initialDataCallback: (realm) {
-      realm.addAll<Category>([
-        Category(
-          ObjectId(),
-          "Home",
-          0xFF177e89,
-          0,
-        ),
-        Category(
-          ObjectId(),
-          "Personal",
-          0xFFDB8480,
-          0,
-        ),
-        Category(
-          ObjectId(),
-          "Work",
-          0xFF335C67,
-          0,
-        ),
-      ]);
-    });
-    realm = Realm(config);
-    updateCategoryValues();
+    _dbRepoImpl = DbRepoImpl();
+    getAllCategory();
     getAllTask();
+    updateCategoryValues();
   }
 
   void getAllCategory() {
     this.categories.clear();
-    List<Category> categories = realm.all<Category>().toList();
+    List<Category> categories = _dbRepoImpl!.getAllCategory();
+    this.categories.add(Category(ObjectId(), "All", 0xFF000000));
     this.categories.addAll(categories);
-    for (var element in categories) {
-      List<Task> totalTasks = realm
-          .all<Task>()
-          .query(r'category.name == $0', [element.name]).toList();
-      List<Task> pendingTasks = realm.all<Task>().query(
-          r'isCompleted == $0 && category.name == $1',
-          [false, element.name]).toList();
-      realm.write(() {
-        element.pendingCount = pendingTasks.length;
-        element.totalCount = totalTasks.length;
-      });
-    }
-    this.categories.add(Category(ObjectId(), "Completed", 0xCB5959FF, totalTask, pendingCount: completeTask));
+    this.categories.add(Category(ObjectId(), "Completed", 0xCB5959FF));
     selectedCategory = this.categories[0];
   }
 
   void addNewCategory(String categoryName, Color selectedColor) {
-    Category category =
-        Category(ObjectId(), categoryName, selectedColor.value, 0);
-    realm.write(() => realm.add(category));
+    _dbRepoImpl!.addNewCategory(
+        categoryName: categoryName, selectedColor: selectedColor);
     getAllCategory();
     notifyListeners();
   }
@@ -79,7 +42,7 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  DateTime get selectedDateTime => _selectedDateTime!;
+  DateTime get selectedDateTime => _selectedDateTime;
 
   set selectedDateTime(DateTime value) {
     _selectedDateTime = value;
@@ -103,19 +66,17 @@ class HomeViewModel extends ChangeNotifier {
 
   void addTask(
       String taskName, Category selectedCategory, DateTime selectedDateTime) {
-    // var config = Configuration.local([Task.schema, Category.schema]);
-    // Realm realm = Realm(config);
-    Task task = Task(ObjectId(), taskName, DateTime.now(), selectedDateTime,
-        category: selectedCategory);
-    realm.write(() => realm.add(task));
-    // realm.close();
+    _dbRepoImpl!.addNewTask(
+        taskName: taskName,
+        selectedCategory: selectedCategory,
+        selectedDateTime: selectedDateTime);
+    updateCategoryValues();
+    notifyListeners();
   }
 
   void getAllTask() {
     this.tasks.clear();
-    // var config = Configuration.local([Task.schema, Category.schema]);
-    // Realm realm = Realm(config);
-    List<Task> tasks = realm.all<Task>().toList();
+    List<Task> tasks = _dbRepoImpl!.getAllTask();
     if (tasks.isNotEmpty) {
       this.tasks.addAll(tasks);
     }
@@ -123,10 +84,7 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void taskComplete(bool value, Task task) {
-    // var config = Configuration.local([Task.schema, Category.schema]);
-    // Realm realm = Realm(config);
-    realm.write(() => task.isCompleted = true);
-    Task taskNewValue = realm.all<Task>().query(r'id == $0', [task.id]).first;
+    Task taskNewValue = _dbRepoImpl!.taskCompletion(value: value, task: task);
     tasks[tasks.indexWhere((element) => element.id == taskNewValue.id)] =
         taskNewValue;
     updateCategoryValues();
@@ -134,8 +92,62 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void updateCategoryValues() {
-    totalTask = realm.all<Task>().toList().length;
-    completeTask = realm.all<Task>().query(r'isCompleted == $0', [true]).toList().length;
-    getAllCategory();
+    for (var element in categories) {
+      if (element.name == "Completed") {
+        int totalCount = tasks.length;
+        int completedTask = tasks
+            .where((taskElement) => taskElement.isCompleted == true)
+            .length;
+        element.totalCount = totalCount;
+        element.pendingCount = completedTask;
+      } else if (element.name == "All") {
+        int totalCount = tasks.length;
+        int pendingTask = tasks
+            .where((taskElement) => taskElement.isCompleted == false)
+            .length;
+        element.totalCount = totalCount;
+        element.pendingCount = pendingTask;
+      } else {
+        int totalCount = tasks
+            .where((taskElement) => taskElement.category!.name == element.name)
+            .length;
+        int pendingCount = tasks
+            .where((taskElement) =>
+                taskElement.isCompleted == false &&
+                taskElement.category!.name == element.name)
+            .length;
+        _dbRepoImpl!.updateCountOfTask(
+            category: element,
+            totalTask: totalCount,
+            completeTask: pendingCount);
+      }
+    }
+    notifyListeners();
+  }
+
+  double getProgress(Category item) {
+    if (item.name == "Completed") {
+      if (item.pendingCount == item.totalCount) {
+        return 1.0;
+      } else {
+        return (item.pendingCount! / item.totalCount!);
+      }
+    } else if (item.name == "All") {
+      if (item.pendingCount == item.totalCount) {
+        return 0.0;
+      } else {
+        return (item.pendingCount! / item.totalCount!) == 0
+            ? 1
+            : (item.pendingCount! / item.totalCount!);
+      }
+    } else {
+      if (item.pendingCount == item.totalCount) {
+        return 0;
+      } else {
+        return (item.pendingCount! / item.totalCount!) == 0
+            ? 1
+            : (item.pendingCount! / item.totalCount!);
+      }
+    }
   }
 }

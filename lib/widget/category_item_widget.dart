@@ -24,7 +24,7 @@ class CategoryItemWidget extends StatelessWidget {
           const SizedBox(
             width: 24,
           ),
-          Text(category.name, style: TextStyle(fontSize: 16,)),
+          Text(category.name, style: const TextStyle(fontSize: 16,)),
           const Spacer(),
           if(category.pendingCount != 0) Container(
             height: 32,

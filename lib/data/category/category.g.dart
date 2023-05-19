@@ -13,9 +13,9 @@ class Category extends _Category
   Category(
     ObjectId id,
     String name,
-    int colorCode,
-    int totalCount, {
-    int pendingCount = 0,
+    int colorCode, {
+    int? totalCount,
+    int? pendingCount = 0,
   }) {
     if (!_defaultsSet) {
       _defaultsSet = RealmObjectBase.setDefaults<Category>({
@@ -47,14 +47,15 @@ class Category extends _Category
   set colorCode(int value) => RealmObjectBase.set(this, 'colorCode', value);
 
   @override
-  int get totalCount => RealmObjectBase.get<int>(this, 'totalCount') as int;
+  int? get totalCount => RealmObjectBase.get<int>(this, 'totalCount') as int?;
   @override
-  set totalCount(int value) => RealmObjectBase.set(this, 'totalCount', value);
+  set totalCount(int? value) => RealmObjectBase.set(this, 'totalCount', value);
 
   @override
-  int get pendingCount => RealmObjectBase.get<int>(this, 'pendingCount') as int;
+  int? get pendingCount =>
+      RealmObjectBase.get<int>(this, 'pendingCount') as int?;
   @override
-  set pendingCount(int value) =>
+  set pendingCount(int? value) =>
       RealmObjectBase.set(this, 'pendingCount', value);
 
   @override
@@ -72,8 +73,8 @@ class Category extends _Category
       SchemaProperty('id', RealmPropertyType.objectid, primaryKey: true),
       SchemaProperty('name', RealmPropertyType.string),
       SchemaProperty('colorCode', RealmPropertyType.int),
-      SchemaProperty('totalCount', RealmPropertyType.int),
-      SchemaProperty('pendingCount', RealmPropertyType.int),
+      SchemaProperty('totalCount', RealmPropertyType.int, optional: true),
+      SchemaProperty('pendingCount', RealmPropertyType.int, optional: true),
     ]);
   }
 }

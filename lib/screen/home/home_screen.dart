@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:msaver/constant/image_constant.dart';
 import 'package:msaver/screen/home/viewmodel/home_viewmodel.dart';
 import 'package:msaver/widget/category_item_widget.dart';
 import 'package:msaver/widget/create_category_item_widget.dart';
@@ -13,8 +14,8 @@ class HomeScreen extends StatelessWidget {
     return ChangeNotifierProvider.value(
       value: HomeViewModel(),
       child: Scaffold(
-        onDrawerChanged: (isOpen) async{
-          if(!isOpen) {
+        onDrawerChanged: (isOpen) async {
+          if (!isOpen) {
             await Future.delayed(const Duration(milliseconds: 100));
             FocusManager.instance.primaryFocus?.unfocus();
           }
@@ -43,7 +44,7 @@ class HomeScreen extends StatelessWidget {
                 strokeWidth: 1,
                 triggerMode: RefreshIndicatorTriggerMode.onEdge,
                 child: SingleChildScrollView(
-                  physics: AlwaysScrollableScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(
                     children: [
                       Column(
@@ -51,10 +52,14 @@ class HomeScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const SizedBox(
-                            height: 54,
+                            height: 32,
+                          ),
+                          buildTextForSwipeDown(context),
+                          const SizedBox(
+                            height: 32,
                           ),
                           Text(
-                            'Category',
+                            'Categories',
                             style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 color: Theme.of(context).hintColor,
@@ -71,14 +76,15 @@ class HomeScreen extends StatelessWidget {
                               scrollDirection: Axis.horizontal,
                               itemBuilder: (BuildContext context, int index) {
                                 return Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 4.0, right: 4.0),
+                                  padding: const EdgeInsets.only(
+                                      top: 4.0, right: 4.0),
                                   child: Card(
                                     child: SizedBox(
-                                      height: MediaQuery.of(context).size.height *
-                                          0.14,
-                                      width:
-                                          MediaQuery.of(context).size.width * 0.5,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.14,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.5,
                                       child: Padding(
                                         padding: const EdgeInsets.only(
                                             left: 16.0,
@@ -93,8 +99,8 @@ class HomeScreen extends StatelessWidget {
                                               '${model.categories[index].pendingCount} Task',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w700,
-                                                  color:
-                                                      Theme.of(context).hintColor,
+                                                  color: Theme.of(context)
+                                                      .hintColor,
                                                   fontSize: 14),
                                             ),
                                             Text(
@@ -105,14 +111,8 @@ class HomeScreen extends StatelessWidget {
                                             ),
                                             const SizedBox(height: 12),
                                             LinearProgressIndicator(
-                                              value: model.categories[index]
-                                                          .pendingCount ==
-                                                      0
-                                                  ? 1
-                                                  : (model.categories[index]
-                                                          .pendingCount /
-                                                      model.categories[index]
-                                                          .totalCount),
+                                              value: model.getProgress(
+                                                  model.categories[index]),
                                               minHeight: 2,
                                               color: Color(model
                                                   .categories[index].colorCode),
@@ -129,61 +129,123 @@ class HomeScreen extends StatelessWidget {
                           const SizedBox(
                             height: 16,
                           ),
-                          ListView.builder(
-                            itemCount: model.tasks.length,
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            reverse: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 16.0),
-                                child: Card(
-                                  color: !model.tasks[index].isCompleted
-                                      ? Theme.of(context).colorScheme.onSecondary
-                                      : Theme.of(context).highlightColor,
-                                  elevation: 0,
-                                  child: ListTile(
-                                    leading: Theme(
-                                      data: ThemeData(
-                                          unselectedWidgetColor: Color(model
-                                              .tasks[index].category!.colorCode)),
-                                      child: Checkbox(
-                                        activeColor: Color(model
-                                            .tasks[index].category!.colorCode).withOpacity(0.3),
-                                        checkColor: Colors.white,
-                                        value: model.tasks[index].isCompleted,
-                                        onChanged: (bool? value) {
-                                          model.taskComplete(
-                                              value!, model.tasks[index]);
-                                        },
+                          model.tasks.isNotEmpty
+                              ? ListView.builder(
+                                  itemCount: model.tasks.length,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  reverse: true,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 16.0),
+                                      child: Card(
+                                        color: !model.tasks[index].isCompleted
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary
+                                            : Theme.of(context).highlightColor,
+                                        elevation: 0,
+                                        child: ListTile(
+                                          leading: Theme(
+                                            data: ThemeData(
+                                                unselectedWidgetColor: Color(
+                                                    model.tasks[index].category!
+                                                        .colorCode)),
+                                            child: Transform.scale(
+                                              scale: 1.2,
+                                              child: Checkbox(
+                                                shape:
+                                                    const RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    8))),
+                                                activeColor: Color(model
+                                                        .tasks[index]
+                                                        .category!
+                                                        .colorCode)
+                                                    .withOpacity(0.3),
+                                                checkColor: Colors.white,
+                                                value: model
+                                                    .tasks[index].isCompleted,
+                                                onChanged: (bool? value) {
+                                                  model.taskComplete(value!,
+                                                      model.tasks[index]);
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          title: Text(
+                                            model.tasks[index].taskName,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                                decoration: model.tasks[index]
+                                                        .isCompleted
+                                                    ? TextDecoration.lineThrough
+                                                    : TextDecoration.none,
+                                                fontSize: 16),
+                                          ),
+                                          subtitle: Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Container(
+                                              padding: const EdgeInsets.only(
+                                                  left: 8,
+                                                  right: 8,
+                                                  bottom: 4,
+                                                  top: 4),
+                                              decoration: BoxDecoration(
+                                                  color: Color(model
+                                                      .tasks[index]
+                                                      .category!
+                                                      .colorCode),
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(12))),
+                                              child: Text(
+                                                model.tasks[index].category!
+                                                    .name,
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Colors.white,
+                                                    fontSize: 12),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    title: Text(
-                                      model.tasks[index].taskName,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          decoration:
-                                              model.tasks[index].isCompleted
-                                                  ? TextDecoration.lineThrough
-                                                  : TextDecoration.none,
-                                          fontSize: 16),
-                                    ),
-                                    // subtitle: Text(
-                                    //   model.tasks[index].category!.name,
-                                    //   style: TextStyle(
-                                    //       fontWeight: FontWeight.w400,
-                                    //       color: Theme.of(context).hintColor,
-                                    //       fontSize: 12),
-                                    // ),
+                                    );
+                                  },
+                                )
+                              : Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(
+                                        height: 120,
+                                      ),
+                                      Image.asset(
+                                        ImageConstant.emptyImage,
+                                        height: 120,
+                                        width: 120,
+                                      ),
+                                      Text(
+                                        'Create new task with swipe down',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            color: Theme.of(context).hintColor,
+                                            fontSize: 14),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16,)
+                          const SizedBox(
+                            height: 16,
+                          )
                         ],
                       ),
                     ],
@@ -193,6 +255,23 @@ class HomeScreen extends StatelessWidget {
             );
           },
         ),
+      ),
+    );
+  }
+
+  Center buildTextForSwipeDown(BuildContext context) {
+    return Center(
+      child: Column(
+        children: [
+          Icon(Icons.swipe_down, color: Theme.of(context).colorScheme.primary),
+          Text(
+            'Swipe down to create new task',
+            style: TextStyle(
+                fontWeight: FontWeight.w400,
+                color: Theme.of(context).hintColor,
+                fontSize: 14),
+          ),
+        ],
       ),
     );
   }
@@ -220,10 +299,10 @@ class HomeScreen extends StatelessWidget {
                             itemBuilder: (BuildContext context, int index) {
                               return CategoryItemWidget(
                                   isSelected: false,
-                                  category: model.categories![index]);
+                                  category: model.categories[index]);
                             },
                             physics: const NeverScrollableScrollPhysics(),
-                            itemCount: model.categories!.length,
+                            itemCount: model.categories.length,
                             shrinkWrap: true),
                         CreateCategoryItemWidget(model)
                       ],

@@ -11,9 +11,9 @@ class _Category{
 
   late int colorCode;
 
-  late int totalCount;
+  late int? totalCount;
 
-  late int pendingCount = 0;
+  late int? pendingCount = 0;
 
 }
 

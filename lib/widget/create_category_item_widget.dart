@@ -76,7 +76,6 @@ class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
                       child: MaterialPicker(
                         pickerColor: Colors.black,
                         onColorChanged: (value){
-                          print(value);
                           Navigator.pop(context);
                           setState(() {
                             selectedColor = value;

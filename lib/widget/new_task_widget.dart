@@ -186,7 +186,6 @@ class NewTaskWidget extends StatelessWidget {
                                 model.selectedCategory, model.selectedDateTime);
                             FocusManager.instance.primaryFocus?.unfocus();
                             await Future.delayed(const Duration(milliseconds: 100));
-
                             Navigator.pop(context);
                           },
                         ),
