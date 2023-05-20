@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:msaver/data/category/category.dart';
 import 'package:msaver/screen/home/viewmodel/home_viewmodel.dart';
+import 'package:msaver/util/app_utils.dart';
 import 'package:msaver/widget/primary_button.dart';
 import 'package:provider/provider.dart';
 
@@ -85,7 +86,7 @@ class NewTaskWidget extends StatelessWidget {
                                 width: 8,
                               ),
                               Text(
-                                model.getValueOfDate(model.selectedDateTime),
+                                AppUtils.getValueOfDate(model.selectedDateTime),
                                 style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     color: Theme.of(context).hintColor,
@@ -142,8 +143,7 @@ class NewTaskWidget extends StatelessWidget {
                               );
                             },
                           );
-
-                          model.selectedCategory = category;
+                          model.updateSelectedCategory(category);
                         },
                         child: Container(
                           decoration: BoxDecoration(

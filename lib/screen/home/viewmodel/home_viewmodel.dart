@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:msaver/data/category/category.dart';
 import 'package:msaver/data/db_repo_impl.dart';
 import 'package:realm/realm.dart';
@@ -17,6 +16,7 @@ class HomeViewModel extends ChangeNotifier {
     getAllCategory();
     getAllTask();
     updateCategoryValues();
+    updateSelectedCategory(categories[0]);
   }
 
   void getAllCategory() {
@@ -25,7 +25,7 @@ class HomeViewModel extends ChangeNotifier {
     this.categories.add(Category(ObjectId(), "All", 0xFF000000));
     this.categories.addAll(categories);
     this.categories.add(Category(ObjectId(), "Completed", 0xCB5959FF));
-    selectedCategory = this.categories[0];
+
   }
 
   void addNewCategory(String categoryName, Color selectedColor) {
@@ -39,6 +39,7 @@ class HomeViewModel extends ChangeNotifier {
 
   set selectedCategory(Category value) {
     _selectedCategory = value;
+    updateTasks();
     notifyListeners();
   }
 
@@ -47,21 +48,6 @@ class HomeViewModel extends ChangeNotifier {
   set selectedDateTime(DateTime value) {
     _selectedDateTime = value;
     notifyListeners();
-  }
-
-  String getValueOfDate(DateTime dateTime) {
-    DateTime date = DateTime(dateTime.year, dateTime.month, dateTime.day);
-    if (date ==
-        DateTime(
-            DateTime.now().year, DateTime.now().month, DateTime.now().day)) {
-      return "Today";
-    } else if (date ==
-        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
-            .add(const Duration(days: 1))) {
-      return "Tomorrow";
-    } else {
-      return DateFormat("EEE, MMM dd").format(dateTime).toString();
-    }
   }
 
   void addTask(
@@ -149,5 +135,27 @@ class HomeViewModel extends ChangeNotifier {
             : (item.pendingCount! / item.totalCount!);
       }
     }
+  }
+
+  void updateTasks() {
+    tasks.clear();
+    if (selectedCategory.name == "Completed") {
+      tasks.addAll(_dbRepoImpl!
+          .getAllTask()
+          .where((element) => element.isCompleted == true));
+    } else if (selectedCategory.name == "All") {
+      tasks.addAll(_dbRepoImpl!
+          .getAllTask()
+          .where((element) => element.isCompleted == false));
+    } else {
+      tasks.addAll(_dbRepoImpl!
+          .getAllTask()
+          .where((element) =>  element.isCompleted == false && element.category!.name == selectedCategory.name));
+    }
+    notifyListeners();
+  }
+
+  void updateSelectedCategory(Category item) {
+    selectedCategory = item;
   }
 }
