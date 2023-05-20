@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:msaver/constant/image_constant.dart';
+import 'package:msaver/enums/enums.dart';
 import 'package:msaver/screen/home/viewmodel/home_viewmodel.dart';
 import 'package:msaver/util/app_utils.dart';
 import 'package:msaver/widget/category_item_widget.dart';
@@ -16,12 +17,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey _filterKey = GlobalKey();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  final ScrollController _controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: HomeViewModel(),
       child: Scaffold(
+        key: scaffoldKey,
         onDrawerChanged: (isOpen) async {
           if (!isOpen) {
             await Future.delayed(const Duration(milliseconds: 100));
@@ -79,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.14,
                             child: ListView.builder(
+                              controller: _controller,
                               itemCount: model.categories.length,
                               shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
@@ -178,18 +183,52 @@ class _HomeScreenState extends State<HomeScreen> {
                                     elevation: 4,
                                     items: [
                                       PopupMenuItem(
-                                          child: const Text("Today"),
-                                          onTap: () {}),
-                                      PopupMenuItem(
-                                        child: const Text("Tomorrow"),
-                                        onTap: () {},
+                                        child: const Text("None"),
+                                        onTap: () {
+                                          model.applyFilter(ApplyFilter.none);
+                                        },
                                       ),
                                       PopupMenuItem(
-                                          child: const Text("Over Due"),
-                                          onTap: () {}),
+                                          child: const Text("Today"),
+                                          onTap: () {
+                                            model
+                                                .applyFilter(ApplyFilter.today);
+                                          }),
                                       PopupMenuItem(
-                                          child: const Text("Custom Day"),
-                                          onTap: () {}),
+                                        child: const Text("Tomorrow"),
+                                        onTap: () {
+                                          model.applyFilter(
+                                              ApplyFilter.tomorrow);
+                                        },
+                                      ),
+                                      PopupMenuItem(
+                                        child: const Text("Over Due"),
+                                        onTap: () {
+                                          model
+                                              .applyFilter(ApplyFilter.overdue);
+                                        },
+                                      ),
+                                      PopupMenuItem(
+                                        child: const Text("Custom Day"),
+                                        onTap: () async {
+                                          Future.delayed(Duration.zero,
+                                              () async {
+                                            Future.delayed(Duration.zero,
+                                                () async {
+                                              DateTime? dateTime =
+                                                  await showDatePicker(
+                                                      context: context,
+                                                      initialDate:
+                                                          model.filterDate,
+                                                      firstDate: DateTime(2000),
+                                                      lastDate: DateTime(2100));
+                                              model.applyFilter(
+                                                  ApplyFilter.customDate,
+                                                  dateTime: dateTime);
+                                            });
+                                          });
+                                        },
+                                      ),
                                     ]);
                               },
                               child: Padding(
@@ -401,6 +440,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 category: model.categories[index],
                                 onCategorySelected: (category) {
                                   model.updateSelectedCategory(category);
+                                  scaffoldKey.currentState!.closeDrawer();
+                                  _animateToIndex(index);
                                 },
                               );
                             },
@@ -417,6 +458,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void _animateToIndex(int index) {
+    _controller.animateTo(
+      index * 200,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.fastOutSlowIn,
     );
   }
 }

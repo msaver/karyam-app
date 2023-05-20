@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:msaver/data/category/category.dart';
 import 'package:msaver/data/db_repo_impl.dart';
+import 'package:msaver/enums/enums.dart';
 import 'package:realm/realm.dart';
 
 class HomeViewModel extends ChangeNotifier {
@@ -10,6 +11,8 @@ class HomeViewModel extends ChangeNotifier {
   Category? _selectedCategory;
   DateTime _selectedDateTime = DateTime.now();
   TextEditingController taskEditingController = TextEditingController();
+  DateTime filterDate = DateTime.now();
+  ApplyFilter? applyFilterType;
 
   HomeViewModel() {
     _dbRepoImpl = DbRepoImpl();
@@ -25,7 +28,6 @@ class HomeViewModel extends ChangeNotifier {
     this.categories.add(Category(ObjectId(), "All", 0xFF000000));
     this.categories.addAll(categories);
     this.categories.add(Category(ObjectId(), "Completed", 0xCB5959FF));
-
   }
 
   void addNewCategory(String categoryName, Color selectedColor) {
@@ -139,23 +141,64 @@ class HomeViewModel extends ChangeNotifier {
 
   void updateTasks() {
     tasks.clear();
+    List<Task> items = [];
     if (selectedCategory.name == "Completed") {
-      tasks.addAll(_dbRepoImpl!
+      items.addAll(_dbRepoImpl!
           .getAllTask()
           .where((element) => element.isCompleted == true));
     } else if (selectedCategory.name == "All") {
-      tasks.addAll(_dbRepoImpl!
+      items.addAll(_dbRepoImpl!
           .getAllTask()
           .where((element) => element.isCompleted == false));
     } else {
-      tasks.addAll(_dbRepoImpl!
-          .getAllTask()
-          .where((element) =>  element.isCompleted == false && element.category!.name == selectedCategory.name));
+      items.addAll(_dbRepoImpl!.getAllTask().where((element) =>
+          element.isCompleted == false &&
+          element.category!.name == selectedCategory.name));
     }
+
+    if (applyFilterType == ApplyFilter.today ||
+        applyFilterType == ApplyFilter.tomorrow ||
+        applyFilterType == ApplyFilter.customDate) {
+      tasks.addAll(items
+          .where((element) =>
+              element.tobeDoneDate.toString().split(" ")[0] ==
+              filterDate.toString().split(" ")[0])
+          .toList());
+    } else if(applyFilterType == ApplyFilter.overdue){
+      tasks.addAll(items
+          .where((element) =>
+      element.tobeDoneDate.isBefore(DateTime.now())).toList());
+    } else{
+      tasks.addAll(items);
+    }
+
     notifyListeners();
   }
 
   void updateSelectedCategory(Category item) {
     selectedCategory = item;
+  }
+
+  void applyFilter(ApplyFilter applyFilter, {DateTime? dateTime}) {
+    applyFilterType = applyFilter;
+    switch (applyFilter) {
+      case ApplyFilter.today:
+        filterDate = DateTime.now();
+        break;
+      case ApplyFilter.tomorrow:
+        filterDate = DateTime.now().add(const Duration(days: 1));
+        break;
+      case ApplyFilter.overdue:
+        filterDate = DateTime.now().subtract(const Duration(days: 1));
+        break;
+      case ApplyFilter.customDate:
+        filterDate = dateTime!;
+        break;
+      default:
+        applyFilterType = applyFilter;
+        filterDate = DateTime.now();
+        break;
+    }
+    updateTasks();
   }
 }
