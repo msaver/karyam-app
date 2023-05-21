@@ -321,8 +321,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         model.tasks[index]
                                                             .tobeDoneDate!),
                                                     Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary
+                                                        .primaryColor
                                                         .value),
                                                 const SizedBox(
                                                   width: 16,
@@ -418,12 +417,15 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const DrawerHeader(
-              child: Center(
-                  child: Text(
-                "Welcome, Shivam",
-                style: TextStyle(fontSize: 24),
-              )),
+            // const DrawerHeader(
+            //   child: Center(
+            //       child: Text(
+            //     "Welcome",
+            //     style: TextStyle(fontSize: 24),
+            //   )),
+            // ),
+            const SizedBox(
+              height: 64,
             ),
             Consumer<HomeViewModel>(
               builder: (BuildContext context, model, Widget? child) {

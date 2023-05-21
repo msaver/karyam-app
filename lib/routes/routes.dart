@@ -10,5 +10,5 @@ class RouteScreen {
         return const HomeScreen();
       },
     )
-  ]);
+  ], );
 }
