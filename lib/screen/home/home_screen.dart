@@ -46,7 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   await Navigator.push(
                     context,
                     PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => NewTaskWidget(model: model),
+                      pageBuilder: (_, __, ___) =>
+                          NewTaskWidget(categories: model.categories),
                       transitionDuration: const Duration(milliseconds: 200),
                       transitionsBuilder: (_, a, __, c) =>
                           FadeTransition(opacity: a, child: c),
@@ -213,19 +214,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                         onTap: () async {
                                           Future.delayed(Duration.zero,
                                               () async {
-                                            Future.delayed(Duration.zero,
-                                                () async {
-                                              DateTime? dateTime =
-                                                  await showDatePicker(
-                                                      context: context,
-                                                      initialDate:
-                                                          model.filterDate,
-                                                      firstDate: DateTime(2000),
-                                                      lastDate: DateTime(2100));
+                                            DateTime? dateTime =
+                                                await showDatePicker(
+                                                    initialEntryMode: DatePickerEntryMode.calendarOnly,
+                                                    context: context,
+                                                    initialDate:
+                                                        model.filterDate,
+                                                    firstDate: DateTime(2000),
+                                                    lastDate: DateTime(2100));
+                                            if (dateTime != null) {
                                               model.applyFilter(
                                                   ApplyFilter.customDate,
                                                   dateTime: dateTime);
-                                            });
+                                            }
                                           });
                                         },
                                       ),
@@ -261,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       padding:
                                           const EdgeInsets.only(right: 16.0),
                                       child: Card(
-                                        color: !model.tasks[index].isCompleted
+                                        color: !model.tasks[index].isCompleted!
                                             ? Theme.of(context)
                                                 .colorScheme
                                                 .onSecondary
@@ -298,14 +299,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           ),
                                           title: Text(
-                                            model.tasks[index].taskName,
+                                            model.tasks[index].taskName!,
                                             style: TextStyle(
                                                 fontWeight: FontWeight.w700,
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .primary,
                                                 decoration: model.tasks[index]
-                                                        .isCompleted
+                                                        .isCompleted!
                                                     ? TextDecoration.lineThrough
                                                     : TextDecoration.none,
                                                 fontSize: 16),
@@ -318,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 chipsContainer(
                                                     AppUtils.getValueOfDate(
                                                         model.tasks[index]
-                                                            .tobeDoneDate),
+                                                            .tobeDoneDate!),
                                                     Theme.of(context)
                                                         .colorScheme
                                                         .secondary
@@ -411,6 +412,7 @@ class _HomeScreenState extends State<HomeScreen> {
   SizedBox buildDrawerWidget(BuildContext context) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 10,
+      height: MediaQuery.of(context).size.height * 1,
       child: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Column(
@@ -430,8 +432,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(left: 32.0, right: 32.0),
                     child: ListView(
                       shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
                       children: [
+                        CreateCategoryItemWidget(model),
                         ListView.builder(
                             itemBuilder: (BuildContext context, int index) {
                               return CategoryItemWidget(
@@ -448,7 +450,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: model.categories.length,
                             shrinkWrap: true),
-                        CreateCategoryItemWidget(model)
                       ],
                     ),
                   ),

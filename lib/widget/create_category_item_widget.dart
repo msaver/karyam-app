@@ -43,7 +43,7 @@ class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
                   const SizedBox(
                     width: 24,
                   ),
-                  const Text("Create List",
+                  const Text("Add new category",
                       style: TextStyle(
                         fontSize: 16,
                       )),

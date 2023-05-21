@@ -6,21 +6,27 @@ import 'package:msaver/widget/primary_button.dart';
 import 'package:provider/provider.dart';
 
 class NewTaskWidget extends StatelessWidget {
-  final HomeViewModel model;
+  // final HomeViewModel model;
+  final List<Category> categories;
+  final List<Category> localCategories = [];
+  NewTaskWidget({super.key, Key? key1, required this.categories}) {
 
-  const NewTaskWidget({Key? key, required this.model}) : super(key: key);
+    localCategories.addAll(categories);
+    localCategories.removeAt(0);
+  }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-      value: model,
+      value: HomeViewModel(),
       child: Scaffold(
         body: Container(
           height: double.infinity,
           width: double.infinity,
           padding: const EdgeInsets.all(16.0),
           child: Consumer<HomeViewModel>(
-            builder: (BuildContext context, value, Widget? child) {
+            builder: (BuildContext context, model, Widget? child) {
+              // model.selectedCategoryForCreateTask = localCategories[0];
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.max,
@@ -114,22 +120,21 @@ class NewTaskWidget extends StatelessWidget {
                                     ),
                                   ),
                                   ListView.builder(
-                                    itemCount: model.categories.length-1,
+                                    itemCount: localCategories.length-1,
                                     shrinkWrap: true,
                                     itemBuilder:
                                         (BuildContext context, int index) {
                                       return ListTile(
                                         onTap: () {
                                           Navigator.pop(
-                                              context, model.categories[index]);
+                                              context, localCategories[index]);
                                         },
                                         leading: Icon(
                                           Icons.crop_square,
-                                          color: Color(model
-                                              .categories[index].colorCode),
+                                          color: Color(localCategories[index].colorCode),
                                         ),
                                         title: Text(
-                                          model.categories[index].name,
+                                          localCategories[index].name,
                                           style: TextStyle(
                                               fontWeight: FontWeight.w700,
                                               color:
@@ -143,7 +148,7 @@ class NewTaskWidget extends StatelessWidget {
                               );
                             },
                           );
-                          model.updateSelectedCategory(category);
+                          model.selectedCategoryForCreateTask = category ;
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -161,7 +166,7 @@ class NewTaskWidget extends StatelessWidget {
                                 width: 8,
                               ),
                               Text(
-                                model.selectedCategory.name,
+                                model.selectedCategoryForCreateTask.name,
                                 style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     color: Theme.of(context).hintColor,
@@ -183,9 +188,9 @@ class NewTaskWidget extends StatelessWidget {
                           text: "Add Task",
                           onPressed: () async{
                             model.addTask(model.taskEditingController.text,
-                                model.selectedCategory, model.selectedDateTime);
+                                model.selectedCategoryForCreateTask, model.selectedDateTime);
                             FocusManager.instance.primaryFocus?.unfocus();
-                            await Future.delayed(const Duration(milliseconds: 100));
+                            await Future.delayed(const Duration(milliseconds: 200));
                             Navigator.pop(context);
                           },
                         ),

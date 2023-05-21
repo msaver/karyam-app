@@ -4,34 +4,32 @@ import 'package:msaver/data/category/category.dart';
 import 'package:msaver/data/db_repository.dart';
 import 'package:realm/realm.dart';
 
-class DbRepoImpl implements DbRepository{
-
+class DbRepoImpl implements DbRepository {
   Realm? _realm;
 
-  DbRepoImpl(){
+  DbRepoImpl() {
     var config = Configuration.local([Task.schema, Category.schema],
         schemaVersion: 1, initialDataCallback: (realm) {
-          realm.addAll<Category>([
-            Category(
-              ObjectId(),
-              "Home",
-              0xFF177e89,
-            ),
-            Category(
-              ObjectId(),
-              "Personal",
-              0xFFDB8480,
-            ),
-            Category(
-              ObjectId(),
-              "Work",
-              0xFF335C67,
-            ),
-          ]);
-        });
+      realm.addAll<Category>([
+        Category(
+          ObjectId(),
+          "Home",
+          0xFF177e89,
+        ),
+        Category(
+          ObjectId(),
+          "Personal",
+          0xFFDB8480,
+        ),
+        Category(
+          ObjectId(),
+          "Work",
+          0xFF335C67,
+        ),
+      ]);
+    });
     _realm = Realm(config);
   }
-
 
   @override
   List<Category> getAllCategory() {
@@ -44,19 +42,24 @@ class DbRepoImpl implements DbRepository{
   }
 
   @override
-  void addNewCategory({required String categoryName, required Color selectedColor}) {
-
-    Category category =
-    Category(ObjectId(), categoryName, selectedColor.value);
+  void addNewCategory(
+      {required String categoryName, required Color selectedColor}) {
+    Category category = Category(ObjectId(), categoryName, selectedColor.value);
     _realm!.write(() => _realm!.add(category));
-
   }
 
   @override
-  void addNewTask({required String taskName, required Category selectedCategory, required DateTime selectedDateTime}) {
-    Task task = Task(ObjectId(), taskName, DateTime.now(), selectedDateTime,
+  void addNewTask(
+      {required String taskName,
+      required Category selectedCategory,
+      required DateTime selectedDateTime}) {
+    Task task = Task(
+        ObjectId(), taskName, DateTime.now().toUtc(), selectedDateTime.toUtc(),
         category: selectedCategory);
-    _realm!.write(() => _realm!.add(task));
+    _realm!.write(() {
+      _realm!.add(task);
+    });
+    // print(item.tobeDoneDate);
   }
 
   @override
@@ -66,11 +69,13 @@ class DbRepoImpl implements DbRepository{
   }
 
   @override
-  void updateCountOfTask({required int totalTask, required int completeTask, required Category category}) {
+  void updateCountOfTask(
+      {required int totalTask,
+      required int completeTask,
+      required Category category}) {
     _realm!.write(() {
       category.pendingCount = completeTask;
       category.totalCount = totalTask;
     });
   }
-
 }

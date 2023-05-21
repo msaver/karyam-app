@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:msaver/data/category/category.dart';
 import 'package:msaver/data/db_repo_impl.dart';
 import 'package:msaver/enums/enums.dart';
+import 'package:msaver/model/task_item.dart';
 import 'package:realm/realm.dart';
 
 class HomeViewModel extends ChangeNotifier {
   List<Category> categories = [];
   DbRepoImpl? _dbRepoImpl;
-  List<Task> tasks = [];
+  List<TaskItem> tasks = [];
   Category? _selectedCategory;
+  Category? _selectedCategoryForCreateTask;
   DateTime _selectedDateTime = DateTime.now();
   TextEditingController taskEditingController = TextEditingController();
   DateTime filterDate = DateTime.now();
@@ -41,6 +43,7 @@ class HomeViewModel extends ChangeNotifier {
 
   set selectedCategory(Category value) {
     _selectedCategory = value;
+    applyFilterType = ApplyFilter.none;
     updateTasks();
     notifyListeners();
   }
@@ -64,17 +67,26 @@ class HomeViewModel extends ChangeNotifier {
 
   void getAllTask() {
     this.tasks.clear();
-    List<Task> tasks = _dbRepoImpl!.getAllTask();
+    List<TaskItem> tasks = getAllTaskFromDb();
     if (tasks.isNotEmpty) {
       this.tasks.addAll(tasks);
     }
     notifyListeners();
   }
 
-  void taskComplete(bool value, Task task) {
-    Task taskNewValue = _dbRepoImpl!.taskCompletion(value: value, task: task);
-    tasks[tasks.indexWhere((element) => element.id == taskNewValue.id)] =
-        taskNewValue;
+  void taskComplete(bool value, TaskItem task) {
+    Task taskNewValue = _dbRepoImpl!.taskCompletion(
+        value: value,
+        task: Task(ObjectId.fromHexString(task.id!), task.taskName!,
+            task.createdDate!, task.tobeDoneDate!));
+    TaskItem item = TaskItem(
+        category: taskNewValue.category,
+        id: taskNewValue.id.toString(),
+        isCompleted: taskNewValue.isCompleted,
+        taskName: taskNewValue.taskName,
+        createdDate: taskNewValue.createdDate.toLocal(),
+        tobeDoneDate: taskNewValue.tobeDoneDate.toLocal());
+    tasks[tasks.indexWhere((element) => element.id == taskNewValue.id)] = item;
     updateCategoryValues();
     notifyListeners();
   }
@@ -82,24 +94,24 @@ class HomeViewModel extends ChangeNotifier {
   void updateCategoryValues() {
     for (var element in categories) {
       if (element.name == "Completed") {
-        int totalCount = tasks.length;
-        int completedTask = tasks
+        int totalCount = getAllTaskFromDb().length;
+        int completedTask = getAllTaskFromDb()
             .where((taskElement) => taskElement.isCompleted == true)
             .length;
         element.totalCount = totalCount;
         element.pendingCount = completedTask;
       } else if (element.name == "All") {
-        int totalCount = tasks.length;
-        int pendingTask = tasks
+        int totalCount = getAllTaskFromDb().length;
+        int pendingTask = getAllTaskFromDb()
             .where((taskElement) => taskElement.isCompleted == false)
             .length;
         element.totalCount = totalCount;
         element.pendingCount = pendingTask;
       } else {
-        int totalCount = tasks
+        int totalCount = getAllTaskFromDb()
             .where((taskElement) => taskElement.category!.name == element.name)
             .length;
-        int pendingCount = tasks
+        int pendingCount = getAllTaskFromDb()
             .where((taskElement) =>
                 taskElement.isCompleted == false &&
                 taskElement.category!.name == element.name)
@@ -124,9 +136,11 @@ class HomeViewModel extends ChangeNotifier {
       if (item.pendingCount == item.totalCount) {
         return 0.0;
       } else {
-        return (item.pendingCount! / item.totalCount!) == 0
-            ? 1
-            : (item.pendingCount! / item.totalCount!);
+        return item.totalCount != null
+            ? (item.pendingCount! / item.totalCount!) == 0
+                ? 1
+                : 1 - (item.pendingCount! / item.totalCount!)
+            : 0;
       }
     } else {
       if (item.pendingCount == item.totalCount) {
@@ -134,24 +148,22 @@ class HomeViewModel extends ChangeNotifier {
       } else {
         return (item.pendingCount! / item.totalCount!) == 0
             ? 1
-            : (item.pendingCount! / item.totalCount!);
+            : 1 - (item.pendingCount! / item.totalCount!);
       }
     }
   }
 
   void updateTasks() {
     tasks.clear();
-    List<Task> items = [];
+    List<TaskItem> items = [];
     if (selectedCategory.name == "Completed") {
-      items.addAll(_dbRepoImpl!
-          .getAllTask()
-          .where((element) => element.isCompleted == true));
+      items.addAll(
+          getAllTaskFromDb().where((element) => element.isCompleted == true));
     } else if (selectedCategory.name == "All") {
-      items.addAll(_dbRepoImpl!
-          .getAllTask()
-          .where((element) => element.isCompleted == false));
+      items.addAll(
+          getAllTaskFromDb().where((element) => element.isCompleted == false));
     } else {
-      items.addAll(_dbRepoImpl!.getAllTask().where((element) =>
+      items.addAll(getAllTaskFromDb().where((element) =>
           element.isCompleted == false &&
           element.category!.name == selectedCategory.name));
     }
@@ -159,20 +171,35 @@ class HomeViewModel extends ChangeNotifier {
     if (applyFilterType == ApplyFilter.today ||
         applyFilterType == ApplyFilter.tomorrow ||
         applyFilterType == ApplyFilter.customDate) {
+      tasks.addAll(items.where((element) {
+        return element.tobeDoneDate.toString().split(" ")[0] ==
+            filterDate.toString().split(" ")[0];
+      }).toList());
+    } else if (applyFilterType == ApplyFilter.overdue) {
       tasks.addAll(items
-          .where((element) =>
-              element.tobeDoneDate.toString().split(" ")[0] ==
-              filterDate.toString().split(" ")[0])
+          .where((element) => element.tobeDoneDate!.isBefore(DateTime.now()))
           .toList());
-    } else if(applyFilterType == ApplyFilter.overdue){
-      tasks.addAll(items
-          .where((element) =>
-      element.tobeDoneDate.isBefore(DateTime.now())).toList());
-    } else{
+    } else {
       tasks.addAll(items);
     }
 
+    tasks.sort((a,b) => b.tobeDoneDate!.compareTo(a.tobeDoneDate!));
+
     notifyListeners();
+  }
+
+  List<TaskItem> getAllTaskFromDb() {
+    List<TaskItem> data = [];
+    _dbRepoImpl!.getAllTask().forEach((element) {
+      data.add(TaskItem(
+          category: element.category,
+          id: element.id.hexString,
+          isCompleted: element.isCompleted,
+          taskName: element.taskName,
+          createdDate: element.createdDate.toLocal(),
+          tobeDoneDate: element.tobeDoneDate.toLocal()));
+    });
+    return data;
   }
 
   void updateSelectedCategory(Category item) {
@@ -189,7 +216,7 @@ class HomeViewModel extends ChangeNotifier {
         filterDate = DateTime.now().add(const Duration(days: 1));
         break;
       case ApplyFilter.overdue:
-        filterDate = DateTime.now().subtract(const Duration(days: 1));
+        filterDate = DateTime.now();
         break;
       case ApplyFilter.customDate:
         filterDate = dateTime!;
@@ -200,5 +227,13 @@ class HomeViewModel extends ChangeNotifier {
         break;
     }
     updateTasks();
+  }
+
+  Category get selectedCategoryForCreateTask =>
+      _selectedCategoryForCreateTask ?? categories[1];
+
+  set selectedCategoryForCreateTask(Category value) {
+    _selectedCategoryForCreateTask = value;
+    notifyListeners();
   }
 }
