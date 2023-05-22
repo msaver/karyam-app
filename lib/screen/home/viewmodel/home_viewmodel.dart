@@ -77,16 +77,15 @@ class HomeViewModel extends ChangeNotifier {
   void taskComplete(bool value, TaskItem task) {
     Task taskNewValue = _dbRepoImpl!.taskCompletion(
         value: value,
-        task: Task(ObjectId.fromHexString(task.id!), task.taskName!,
-            task.createdDate!, task.tobeDoneDate!));
+        id: ObjectId.fromHexString(task.id!));
     TaskItem item = TaskItem(
         category: taskNewValue.category,
-        id: taskNewValue.id.toString(),
+        id: taskNewValue.id.hexString,
         isCompleted: taskNewValue.isCompleted,
         taskName: taskNewValue.taskName,
         createdDate: taskNewValue.createdDate.toLocal(),
         tobeDoneDate: taskNewValue.tobeDoneDate.toLocal());
-    tasks[tasks.indexWhere((element) => element.id == taskNewValue.id)] = item;
+    tasks[tasks.indexWhere((element) => element.id == taskNewValue.id.hexString)] = item;
     updateCategoryValues();
     notifyListeners();
   }

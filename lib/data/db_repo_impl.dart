@@ -63,7 +63,10 @@ class DbRepoImpl implements DbRepository {
   }
 
   @override
-  Task taskCompletion({required bool value, required Task task}) {
+  Task taskCompletion({required bool value, required ObjectId id}) {
+
+    Task task = _realm!.all<Task>().query(r'id == $0', [id]).first;
+
     _realm!.write(() => task.isCompleted = value);
     return _realm!.all<Task>().query(r'id == $0', [task.id]).first;
   }

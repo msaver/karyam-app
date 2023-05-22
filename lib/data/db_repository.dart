@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:msaver/data/category/category.dart';
+import 'package:realm/realm.dart';
 
 abstract class DbRepository {
   List<Category> getAllCategory();
@@ -14,7 +15,7 @@ abstract class DbRepository {
       required Category selectedCategory,
       required DateTime selectedDateTime});
 
-  Task taskCompletion({required bool value, required Task task});
+  Task taskCompletion({required bool value, required ObjectId id});
 
   void updateCountOfTask(
       {required int totalTask,
