@@ -1,0 +1,17 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:msaver/constant/string_constant.dart';
+import 'package:msaver/data/preference/preferences_data.dart';
+
+class SetupProfileViewModel extends ChangeNotifier{
+
+  final TextEditingController nameController = TextEditingController();
+
+  SetupProfileViewModel();
+
+  void updateName(BuildContext context) {
+    PreferencesData.setUserName(userName: nameController.text);
+    context.go(StringConstant.home);
+  }
+
+}

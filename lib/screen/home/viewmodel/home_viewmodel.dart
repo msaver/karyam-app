@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:msaver/data/category/category.dart';
 import 'package:msaver/data/db_repo_impl.dart';
+import 'package:msaver/data/preference/preferences_data.dart';
 import 'package:msaver/enums/enums.dart';
 import 'package:msaver/model/task_item.dart';
 import 'package:realm/realm.dart';
@@ -15,6 +16,7 @@ class HomeViewModel extends ChangeNotifier {
   TextEditingController taskEditingController = TextEditingController();
   DateTime filterDate = DateTime.now();
   ApplyFilter? applyFilterType;
+  String? userName;
 
   HomeViewModel() {
     _dbRepoImpl = DbRepoImpl();
@@ -22,6 +24,7 @@ class HomeViewModel extends ChangeNotifier {
     getAllTask();
     updateCategoryValues();
     updateSelectedCategory(categories[0]);
+    getUserName();
   }
 
   void getAllCategory() {
@@ -234,5 +237,11 @@ class HomeViewModel extends ChangeNotifier {
   set selectedCategoryForCreateTask(Category value) {
     _selectedCategoryForCreateTask = value;
     notifyListeners();
+  }
+
+  void getUserName() async{
+    userName = await PreferencesData.getUserName();
+    notifyListeners();
+
   }
 }

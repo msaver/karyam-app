@@ -216,7 +216,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                               () async {
                                             DateTime? dateTime =
                                                 await showDatePicker(
-                                                    initialEntryMode: DatePickerEntryMode.calendarOnly,
+                                                    initialEntryMode:
+                                                        DatePickerEntryMode
+                                                            .calendarOnly,
                                                     context: context,
                                                     initialDate:
                                                         model.filterDate,
@@ -414,22 +416,20 @@ class _HomeScreenState extends State<HomeScreen> {
       height: MediaQuery.of(context).size.height * 1,
       child: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // const DrawerHeader(
-            //   child: Center(
-            //       child: Text(
-            //     "Welcome",
-            //     style: TextStyle(fontSize: 24),
-            //   )),
-            // ),
-            const SizedBox(
-              height: 64,
-            ),
-            Consumer<HomeViewModel>(
-              builder: (BuildContext context, model, Widget? child) {
-                return Expanded(
+        child: Consumer<HomeViewModel>(
+          builder: (BuildContext context, model, Widget? child) {
+            return  Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                DrawerHeader(
+                  child: Center(
+                      child: Text(
+                        "Welcome, ${model.userName}",
+                        style: const TextStyle(fontSize: 24),
+                      )),
+                ),
+
+                Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 32.0, right: 32.0),
                     child: ListView(
@@ -455,10 +455,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                );
-              },
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
