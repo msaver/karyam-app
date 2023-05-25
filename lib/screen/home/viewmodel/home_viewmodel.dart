@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:msaver/data/category/category.dart';
-import 'package:msaver/data/db_repo_impl.dart';
-import 'package:msaver/data/preference/preferences_data.dart';
-import 'package:msaver/enums/enums.dart';
-import 'package:msaver/model/task_item.dart';
+import 'package:karyam/data/category/category.dart';
+import 'package:karyam/data/db_repo_impl.dart';
+import 'package:karyam/data/preference/preferences_data.dart';
+import 'package:karyam/enums/enums.dart';
+import 'package:karyam/model/task_item.dart';
 import 'package:realm/realm.dart';
 
 class HomeViewModel extends ChangeNotifier {
@@ -243,5 +243,9 @@ class HomeViewModel extends ChangeNotifier {
     userName = await PreferencesData.getUserName();
     notifyListeners();
 
+  }
+
+  void closeDb() {
+    _dbRepoImpl!.closeDb();
   }
 }

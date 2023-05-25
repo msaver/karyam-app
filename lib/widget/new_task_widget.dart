@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:msaver/data/category/category.dart';
-import 'package:msaver/screen/home/viewmodel/home_viewmodel.dart';
-import 'package:msaver/util/app_utils.dart';
-import 'package:msaver/widget/primary_button.dart';
+import 'package:karyam/data/category/category.dart';
+import 'package:karyam/screen/home/viewmodel/home_viewmodel.dart';
+import 'package:karyam/util/app_utils.dart';
+import 'package:karyam/widget/primary_button.dart';
 import 'package:provider/provider.dart';
 
 class NewTaskWidget extends StatelessWidget {

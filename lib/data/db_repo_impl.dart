@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import 'package:msaver/data/category/category.dart';
-import 'package:msaver/data/db_repository.dart';
+import 'package:karyam/data/category/category.dart';
+import 'package:karyam/data/db_repository.dart';
 import 'package:realm/realm.dart';
 
 class DbRepoImpl implements DbRepository {
@@ -81,4 +81,11 @@ class DbRepoImpl implements DbRepository {
       category.totalCount = totalTask;
     });
   }
+
+  @override
+  void closeDb() {
+   _realm!.close();
+  }
+
+
 }

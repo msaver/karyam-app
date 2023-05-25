@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:msaver/screen/setup_profile/viewmodel/setup_profile_viewmodel.dart';
-import 'package:msaver/widget/primary_button.dart';
+import 'package:karyam/screen/setup_profile/viewmodel/setup_profile_viewmodel.dart';
+import 'package:karyam/widget/primary_button.dart';
 import 'package:provider/provider.dart';
 
 class SetupProfileScreen extends StatefulWidget {

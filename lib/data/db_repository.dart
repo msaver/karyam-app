@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:msaver/data/category/category.dart';
+import 'package:karyam/data/category/category.dart';
 import 'package:realm/realm.dart';
 
 abstract class DbRepository {
@@ -21,4 +21,6 @@ abstract class DbRepository {
       {required int totalTask,
       required int completeTask,
       required Category category});
+
+  void closeDb();
 }

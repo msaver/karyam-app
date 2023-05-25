@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:msaver/constant/image_constant.dart';
-import 'package:msaver/enums/enums.dart';
-import 'package:msaver/screen/home/viewmodel/home_viewmodel.dart';
-import 'package:msaver/util/app_utils.dart';
-import 'package:msaver/widget/category_item_widget.dart';
-import 'package:msaver/widget/create_category_item_widget.dart';
-import 'package:msaver/widget/new_task_widget.dart';
+import 'package:karyam/constant/image_constant.dart';
+import 'package:karyam/enums/enums.dart';
+import 'package:karyam/screen/home/viewmodel/home_viewmodel.dart';
+import 'package:karyam/util/app_utils.dart';
+import 'package:karyam/widget/category_item_widget.dart';
+import 'package:karyam/widget/create_category_item_widget.dart';
+import 'package:karyam/widget/new_task_widget.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,11 +19,18 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey _filterKey = GlobalKey();
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _controller = ScrollController();
+  HomeViewModel homeViewModel = HomeViewModel();
+
+  @override
+  void dispose() {
+    homeViewModel.closeDb();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-      value: HomeViewModel(),
+      value: homeViewModel,
       child: Scaffold(
         key: scaffoldKey,
         onDrawerChanged: (isOpen) async {
@@ -35,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
         drawer: buildDrawerWidget(context),
         appBar: AppBar(
           elevation: 12,
-          title: const Text("M.Saver"),
+          title: const Text("Karyam"),
         ),
         body: Consumer<HomeViewModel>(
           builder: (BuildContext context, model, Widget? child) {

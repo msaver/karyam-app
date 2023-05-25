@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:msaver/routes/routes.dart';
+import 'package:karyam/routes/routes.dart';
 
 import 'color_schemes.g.dart';
 
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'M-Saver',
+      title: 'Karyam',
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: lightColorScheme,

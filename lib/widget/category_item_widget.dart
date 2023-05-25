@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:msaver/data/category/category.dart';
+import 'package:karyam/data/category/category.dart';
 
 class CategoryItemWidget extends StatelessWidget {
   final bool isSelected;

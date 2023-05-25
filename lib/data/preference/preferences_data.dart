@@ -1,6 +1,6 @@
 
-import 'package:msaver/constant/string_constant.dart';
-import 'package:msaver/data/preference/shared_preferences.dart';
+import 'package:karyam/constant/string_constant.dart';
+import 'package:karyam/data/preference/shared_preferences.dart';
 
 class PreferencesData {
  
