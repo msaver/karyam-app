@@ -11,6 +11,9 @@ class SetupProfileScreen extends StatefulWidget {
 }
 
 class _SetupProfileScreenState extends State<SetupProfileScreen> {
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
@@ -43,17 +46,23 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
             ),
             Align(
               alignment: Alignment.center,
-              child: TextFormField(
-                controller: model.nameController,
-                style: const TextStyle(fontSize: 24.0),
-                maxLines: 1,
-                decoration: const InputDecoration(
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                  hintText: "Your name, please",
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(
-                    fontSize: 24,
+              child: Form(
+                key: _formKey,
+                child: TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: model.nameController,
+                  validator: (value) =>
+                  value!.isEmpty ? 'Please Enter Name' : null,
+                  style: const TextStyle(fontSize: 24.0),
+                  maxLines: 1,
+                  decoration: const InputDecoration(
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                    hintText: "Your name, please",
+                    border: InputBorder.none,
+                    hintStyle: TextStyle(
+                      fontSize: 24,
+                    ),
                   ),
                 ),
               ),
@@ -64,7 +73,9 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
             Align(
               alignment: Alignment.bottomCenter,
               child: PrimaryButton(text: "Next", onPressed: () {
-                model.updateName(context);
+                if(_formKey.currentState!.validate()){
+                  model.updateName(context);
+                }
               }),
             )
           ],

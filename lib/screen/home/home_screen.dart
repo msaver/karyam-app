@@ -418,17 +418,30 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Consumer<HomeViewModel>(
           builder: (BuildContext context, model, Widget? child) {
-            return  Column(
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 DrawerHeader(
-                  child: Center(
-                      child: Text(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        radius: 32,
+                        child: Text(model.userName![0],
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w300)),
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      Text(
                         "Welcome, ${model.userName}",
-                        style: const TextStyle(fontSize: 24),
-                      )),
+                        style: const TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
                 ),
-
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 32.0, right: 32.0),
