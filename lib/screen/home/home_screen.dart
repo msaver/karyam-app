@@ -60,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           FadeTransition(opacity: a, child: c),
                     ),
                   );
+                  model.updateTasks();
                 },
                 strokeWidth: 1,
                 triggerMode: RefreshIndicatorTriggerMode.onEdge,

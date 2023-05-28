@@ -9,8 +9,10 @@ class NewTaskWidget extends StatelessWidget {
   // final HomeViewModel model;
   final List<Category> categories;
   final List<Category> localCategories = [];
-  NewTaskWidget({super.key, Key? key1, required this.categories}) {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+
+  NewTaskWidget({super.key, Key? key1, required this.categories}) {
     localCategories.addAll(categories);
     localCategories.removeAt(0);
   }
@@ -50,21 +52,27 @@ class NewTaskWidget extends StatelessWidget {
                   ),
                   Align(
                     alignment: Alignment.center,
-                    child: TextFormField(
-                      controller: model.taskEditingController,
-                      style: const TextStyle(fontSize: 24.0),
-                      maxLines: 2,
-                      decoration: const InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        border: InputBorder.none,
-                        hintText: "What you wanna do?",
-                        hintStyle: TextStyle(
-                          fontSize: 24,
+                    child: Form(
+                      key: _formKey,
+                      child: TextFormField(
+                        controller: model.taskEditingController,
+                        style: const TextStyle(fontSize: 24.0),
+                        validator: (value) =>
+                        value!.trim().isEmpty ? 'Please enter task here' : null,
+                        maxLines: 2,
+                        decoration: const InputDecoration(
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          border: InputBorder.none,
+                          hintText: "What you wanna do?",
+                          hintStyle: TextStyle(
+                            fontSize: 24,
+                          ),
                         ),
                       ),
                     ),
                   ),
+                  SizedBox(height: 16,),
                   Row(
                     children: [
                       InkWell(
@@ -120,7 +128,7 @@ class NewTaskWidget extends StatelessWidget {
                                     ),
                                   ),
                                   ListView.builder(
-                                    itemCount: localCategories.length-1,
+                                    itemCount: localCategories.length - 1,
                                     shrinkWrap: true,
                                     itemBuilder:
                                         (BuildContext context, int index) {
@@ -131,7 +139,8 @@ class NewTaskWidget extends StatelessWidget {
                                         },
                                         leading: Icon(
                                           Icons.crop_square,
-                                          color: Color(localCategories[index].colorCode),
+                                          color: Color(
+                                              localCategories[index].colorCode),
                                         ),
                                         title: Text(
                                           localCategories[index].name,
@@ -148,7 +157,7 @@ class NewTaskWidget extends StatelessWidget {
                               );
                             },
                           );
-                          model.selectedCategoryForCreateTask = category ;
+                          model.selectedCategoryForCreateTask = category;
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -186,12 +195,17 @@ class NewTaskWidget extends StatelessWidget {
                         height: 54,
                         child: PrimaryButton(
                           text: "Add Task",
-                          onPressed: () async{
-                            model.addTask(model.taskEditingController.text,
-                                model.selectedCategoryForCreateTask, model.selectedDateTime);
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            await Future.delayed(const Duration(milliseconds: 200));
-                            Navigator.pop(context);
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              model.addTask(
+                                  model.taskEditingController.text,
+                                  model.selectedCategoryForCreateTask,
+                                  model.selectedDateTime);
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              await Future.delayed(
+                                  const Duration(milliseconds: 200));
+                              Navigator.pop(context);
+                            }
                           },
                         ),
                       ),
@@ -205,4 +219,8 @@ class NewTaskWidget extends StatelessWidget {
       ),
     );
   }
+
+  // void showInSnackBar(String value) {
+  //   _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(value)));
+  // }
 }
