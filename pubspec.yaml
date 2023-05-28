@@ -42,6 +42,9 @@ dependencies:
   intl: ^0.18.1
   flutter_slidable: ^3.0.0
   shared_preferences: ^2.0.8
+  firebase_crashlytics: ^3.0.10
+  firebase_core: ^2.4.1
+  firebase_analytics: ^10.4.1
 
 dev_dependencies:
   flutter_test:
