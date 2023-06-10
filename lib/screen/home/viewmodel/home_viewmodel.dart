@@ -39,6 +39,7 @@ class HomeViewModel extends ChangeNotifier {
     _dbRepoImpl!.addNewCategory(
         categoryName: categoryName, selectedColor: selectedColor);
     getAllCategory();
+    updateCategoryValues();
     notifyListeners();
   }
 
