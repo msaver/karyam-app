@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:karyam/constant/image_constant.dart';
 import 'package:karyam/enums/enums.dart';
 import 'package:karyam/screen/home/viewmodel/home_viewmodel.dart';
@@ -43,6 +44,17 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           elevation: 12,
           title: const Text("Karyam"),
+          actions: [
+            InkWell(
+              onTap: (){
+                context.go("/home/about");
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.info_outline),
+              ),
+            )
+          ],
         ),
         body: Consumer<HomeViewModel>(
           builder: (BuildContext context, model, Widget? child) {
