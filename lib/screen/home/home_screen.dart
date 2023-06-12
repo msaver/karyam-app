@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:karyam/constant/image_constant.dart';
@@ -8,6 +10,7 @@ import 'package:karyam/widget/category_item_widget.dart';
 import 'package:karyam/widget/create_category_item_widget.dart';
 import 'package:karyam/widget/new_task_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:upgrader/upgrader.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -32,368 +35,389 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: homeViewModel,
-      child: Scaffold(
-        key: scaffoldKey,
-        onDrawerChanged: (isOpen) async {
-          if (!isOpen) {
-            await Future.delayed(const Duration(milliseconds: 100));
-            FocusManager.instance.primaryFocus?.unfocus();
-          }
-        },
-        drawer: buildDrawerWidget(context),
-        appBar: AppBar(
-          elevation: 12,
-          title: const Text("Karyam"),
-          actions: [
-            InkWell(
-              onTap: (){
-                context.go("/home/about");
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(Icons.info_outline),
-              ),
-            )
-          ],
-        ),
-        body: Consumer<HomeViewModel>(
-          builder: (BuildContext context, model, Widget? child) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 16.0),
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  await Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (_, __, ___) =>
-                          NewTaskWidget(categories: model.categories),
-                      transitionDuration: const Duration(milliseconds: 200),
-                      transitionsBuilder: (_, a, __, c) =>
-                          FadeTransition(opacity: a, child: c),
-                    ),
-                  );
-                  model.updateTasks();
+      child: UpgradeAlert(
+        upgrader: Upgrader(
+            dialogStyle: Platform.isAndroid
+                ? UpgradeDialogStyle.material
+                : UpgradeDialogStyle.cupertino),
+        child: Scaffold(
+          key: scaffoldKey,
+          onDrawerChanged: (isOpen) async {
+            if (!isOpen) {
+              await Future.delayed(const Duration(milliseconds: 100));
+              FocusManager.instance.primaryFocus?.unfocus();
+            }
+          },
+          drawer: buildDrawerWidget(context),
+          appBar: AppBar(
+            elevation: 12,
+            title: const Text("Karyam"),
+            actions: [
+              InkWell(
+                onTap: () {
+                  context.go("/home/about");
                 },
-                strokeWidth: 1,
-                triggerMode: RefreshIndicatorTriggerMode.onEdge,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(
-                            height: 32,
-                          ),
-                          buildTextForSwipeDown(context),
-                          const SizedBox(
-                            height: 32,
-                          ),
-                          Text(
-                            'Categories',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).hintColor,
-                                fontSize: 14),
-                          ),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.14,
-                            child: ListView.builder(
-                              controller: _controller,
-                              itemCount: model.categories.length,
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (BuildContext context, int index) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 4.0, right: 4.0),
-                                  child: Card(
-                                    borderOnForeground: false,
-                                    shape: RoundedRectangleBorder(
-                                      side: BorderSide(
-                                          color: model.selectedCategory.name ==
-                                                  model.categories[index].name
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .primary
-                                              : Colors.transparent),
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(12),
-                                      ),
-                                    ),
-                                    child: InkWell(
-                                      onTap: () {
-                                        model.updateSelectedCategory(
-                                            model.categories[index]);
-                                      },
-                                      child: SizedBox(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.14,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.5,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 16.0,
-                                              right: 16,
-                                              top: 8.0,
-                                              bottom: 8.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                '${model.categories[index].pendingCount} Task',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Theme.of(context)
-                                                        .hintColor,
-                                                    fontSize: 14),
-                                              ),
-                                              Text(
-                                                model.categories[index].name,
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.w700,
-                                                    fontSize: 20),
-                                              ),
-                                              const SizedBox(height: 12),
-                                              LinearProgressIndicator(
-                                                value: model.getProgress(
-                                                    model.categories[index]),
-                                                minHeight: 2,
-                                                color: Color(model
-                                                    .categories[index]
-                                                    .colorCode),
-                                              )
-                                            ],
-                                          ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(Icons.info_outline),
+                ),
+              )
+            ],
+          ),
+          body: Consumer<HomeViewModel>(
+            builder: (BuildContext context, model, Widget? child) {
+              return Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (_, __, ___) =>
+                            NewTaskWidget(categories: model.categories),
+                        transitionDuration: const Duration(milliseconds: 200),
+                        transitionsBuilder: (_, a, __, c) =>
+                            FadeTransition(opacity: a, child: c),
+                      ),
+                    );
+                    model.updateTasks();
+                  },
+                  strokeWidth: 1,
+                  triggerMode: RefreshIndicatorTriggerMode.onEdge,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(
+                              height: 32,
+                            ),
+                            buildTextForSwipeDown(context),
+                            const SizedBox(
+                              height: 32,
+                            ),
+                            Text(
+                              'Categories',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Theme.of(context).hintColor,
+                                  fontSize: 14),
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.14,
+                              child: ListView.builder(
+                                controller: _controller,
+                                itemCount: model.categories.length,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 4.0, right: 4.0),
+                                    child: Card(
+                                      borderOnForeground: false,
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(
+                                            color: model.selectedCategory
+                                                        .name ==
+                                                    model.categories[index].name
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                : Colors.transparent),
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(12),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: InkWell(
-                              onTap: () {
-                                final RenderBox renderBox = _filterKey
-                                    .currentContext
-                                    ?.findRenderObject() as RenderBox;
-                                final Size size = renderBox.size;
-                                final Offset offset =
-                                    renderBox.localToGlobal(Offset.zero);
-                                showMenu(
-                                    context: context,
-                                    position: RelativeRect.fromLTRB(
-                                        offset.dx,
-                                        offset.dy + size.height,
-                                        offset.dx + size.width,
-                                        offset.dy + size.height),
-                                    elevation: 4,
-                                    items: [
-                                      PopupMenuItem(
-                                        child: const Text("None"),
+                                      child: InkWell(
                                         onTap: () {
-                                          model.applyFilter(ApplyFilter.none);
+                                          model.updateSelectedCategory(
+                                              model.categories[index]);
                                         },
-                                      ),
-                                      PopupMenuItem(
-                                          child: const Text("Today"),
-                                          onTap: () {
-                                            model
-                                                .applyFilter(ApplyFilter.today);
-                                          }),
-                                      PopupMenuItem(
-                                        child: const Text("Tomorrow"),
-                                        onTap: () {
-                                          model.applyFilter(
-                                              ApplyFilter.tomorrow);
-                                        },
-                                      ),
-                                      PopupMenuItem(
-                                        child: const Text("Over Due"),
-                                        onTap: () {
-                                          model
-                                              .applyFilter(ApplyFilter.overdue);
-                                        },
-                                      ),
-                                      PopupMenuItem(
-                                        child: const Text("Custom Day"),
-                                        onTap: () async {
-                                          Future.delayed(Duration.zero,
-                                              () async {
-                                            DateTime? dateTime =
-                                                await showDatePicker(
-                                                    initialEntryMode:
-                                                        DatePickerEntryMode
-                                                            .calendarOnly,
-                                                    context: context,
-                                                    initialDate:
-                                                        model.filterDate,
-                                                    firstDate: DateTime(2000),
-                                                    lastDate: DateTime(2100));
-                                            if (dateTime != null) {
-                                              model.applyFilter(
-                                                  ApplyFilter.customDate,
-                                                  dateTime: dateTime);
-                                            }
-                                          });
-                                        },
-                                      ),
-                                    ]);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  right: 16.0,
-                                  left: 4,
-                                  top: 4,
-                                ),
-                                child: Icon(
-                                  key: _filterKey,
-                                  Icons.filter_alt,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                            ),
-                          ),
-                          // SelectDateWidget(),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          model.tasks.isNotEmpty
-                              ? ListView.builder(
-                                  itemCount: model.tasks.length,
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  reverse: true,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 16.0),
-                                      child: Card(
-                                        color: !model.tasks[index].isCompleted!
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .onSecondary
-                                            : Theme.of(context).highlightColor,
-                                        elevation: 0,
-                                        child: ListTile(
-                                          leading: Theme(
-                                            data: ThemeData(
-                                                unselectedWidgetColor: Color(
-                                                    model.tasks[index].category!
-                                                        .colorCode)),
-                                            child: Transform.scale(
-                                              scale: 1.2,
-                                              child: Checkbox(
-                                                shape:
-                                                    const RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    8))),
-                                                activeColor: Color(model
-                                                        .tasks[index]
-                                                        .category!
-                                                        .colorCode)
-                                                    .withOpacity(0.3),
-                                                checkColor: Colors.white,
-                                                value: model
-                                                    .tasks[index].isCompleted,
-                                                onChanged: (bool? value) {
-                                                  model.taskComplete(value!,
-                                                      model.tasks[index]);
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                          title: Text(
-                                            model.tasks[index].taskName!,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
-                                                decoration: model.tasks[index]
-                                                        .isCompleted!
-                                                    ? TextDecoration.lineThrough
-                                                    : TextDecoration.none,
-                                                fontSize: 16),
-                                          ),
-                                          subtitle: Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 4.0),
-                                            child: Row(
+                                        child: SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.14,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.5,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 16.0,
+                                                right: 16,
+                                                top: 8.0,
+                                                bottom: 8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                chipsContainer(
-                                                    AppUtils.getValueOfDate(
-                                                        model.tasks[index]
-                                                            .tobeDoneDate!),
-                                                    Theme.of(context)
-                                                        .primaryColor
-                                                        .value),
-                                                const SizedBox(
-                                                  width: 16,
+                                                Text(
+                                                  '${model.categories[index].pendingCount} Task',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Theme.of(context)
+                                                          .hintColor,
+                                                      fontSize: 14),
                                                 ),
-                                                chipsContainer(
-                                                    model.tasks[index].category!
-                                                        .name,
-                                                    model.tasks[index].category!
-                                                        .colorCode),
+                                                Text(
+                                                  model.categories[index].name,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontSize: 20),
+                                                ),
+                                                const SizedBox(height: 12),
+                                                LinearProgressIndicator(
+                                                  value: model.getProgress(
+                                                      model.categories[index]),
+                                                  minHeight: 2,
+                                                  color: Color(model
+                                                      .categories[index]
+                                                      .colorCode),
+                                                )
                                               ],
                                             ),
                                           ),
                                         ),
                                       ),
-                                    );
-                                  },
-                                )
-                              : Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const SizedBox(
-                                        height: 120,
-                                      ),
-                                      Image.asset(
-                                        ImageConstant.emptyImage,
-                                        height: 120,
-                                        width: 120,
-                                      ),
-                                      Text(
-                                        'Create new task with swipe down',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            color: Theme.of(context).hintColor,
-                                            fontSize: 14),
-                                      ),
-                                    ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: InkWell(
+                                onTap: () {
+                                  final RenderBox renderBox = _filterKey
+                                      .currentContext
+                                      ?.findRenderObject() as RenderBox;
+                                  final Size size = renderBox.size;
+                                  final Offset offset =
+                                      renderBox.localToGlobal(Offset.zero);
+                                  showMenu(
+                                      context: context,
+                                      position: RelativeRect.fromLTRB(
+                                          offset.dx,
+                                          offset.dy + size.height,
+                                          offset.dx + size.width,
+                                          offset.dy + size.height),
+                                      elevation: 4,
+                                      items: [
+                                        PopupMenuItem(
+                                          child: const Text("None"),
+                                          onTap: () {
+                                            model.applyFilter(ApplyFilter.none);
+                                          },
+                                        ),
+                                        PopupMenuItem(
+                                            child: const Text("Today"),
+                                            onTap: () {
+                                              model.applyFilter(
+                                                  ApplyFilter.today);
+                                            }),
+                                        PopupMenuItem(
+                                          child: const Text("Tomorrow"),
+                                          onTap: () {
+                                            model.applyFilter(
+                                                ApplyFilter.tomorrow);
+                                          },
+                                        ),
+                                        PopupMenuItem(
+                                          child: const Text("Over Due"),
+                                          onTap: () {
+                                            model.applyFilter(
+                                                ApplyFilter.overdue);
+                                          },
+                                        ),
+                                        PopupMenuItem(
+                                          child: const Text("Custom Day"),
+                                          onTap: () async {
+                                            Future.delayed(Duration.zero,
+                                                () async {
+                                              DateTime? dateTime =
+                                                  await showDatePicker(
+                                                      initialEntryMode:
+                                                          DatePickerEntryMode
+                                                              .calendarOnly,
+                                                      context: context,
+                                                      initialDate:
+                                                          model.filterDate,
+                                                      firstDate: DateTime(2000),
+                                                      lastDate: DateTime(2100));
+                                              if (dateTime != null) {
+                                                model.applyFilter(
+                                                    ApplyFilter.customDate,
+                                                    dateTime: dateTime);
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      ]);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: 16.0,
+                                    left: 4,
+                                    top: 4,
+                                  ),
+                                  child: Icon(
+                                    key: _filterKey,
+                                    Icons.filter_alt,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
-                          const SizedBox(
-                            height: 16,
-                          )
-                        ],
-                      ),
-                    ],
+                              ),
+                            ),
+                            // SelectDateWidget(),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            model.tasks.isNotEmpty
+                                ? ListView.builder(
+                                    itemCount: model.tasks.length,
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    reverse: true,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 16.0),
+                                        child: Card(
+                                          color:
+                                              !model.tasks[index].isCompleted!
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .onSecondary
+                                                  : Theme.of(context)
+                                                      .highlightColor,
+                                          elevation: 0,
+                                          child: ListTile(
+                                            leading: Theme(
+                                              data: ThemeData(
+                                                  unselectedWidgetColor: Color(
+                                                      model
+                                                          .tasks[index]
+                                                          .category!
+                                                          .colorCode)),
+                                              child: Transform.scale(
+                                                scale: 1.2,
+                                                child: Checkbox(
+                                                  shape:
+                                                      const RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          8))),
+                                                  activeColor: Color(model
+                                                          .tasks[index]
+                                                          .category!
+                                                          .colorCode)
+                                                      .withOpacity(0.3),
+                                                  checkColor: Colors.white,
+                                                  value: model
+                                                      .tasks[index].isCompleted,
+                                                  onChanged: (bool? value) {
+                                                    model.taskComplete(value!,
+                                                        model.tasks[index]);
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            title: Text(
+                                              model.tasks[index].taskName!,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                  decoration: model.tasks[index]
+                                                          .isCompleted!
+                                                      ? TextDecoration
+                                                          .lineThrough
+                                                      : TextDecoration.none,
+                                                  fontSize: 16),
+                                            ),
+                                            subtitle: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 4.0),
+                                              child: Row(
+                                                children: [
+                                                  chipsContainer(
+                                                      AppUtils.getValueOfDate(
+                                                          model.tasks[index]
+                                                              .tobeDoneDate!),
+                                                      Theme.of(context)
+                                                          .primaryColor
+                                                          .value),
+                                                  const SizedBox(
+                                                    width: 16,
+                                                  ),
+                                                  chipsContainer(
+                                                      model.tasks[index]
+                                                          .category!.name,
+                                                      model.tasks[index]
+                                                          .category!.colorCode),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  )
+                                : Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const SizedBox(
+                                          height: 120,
+                                        ),
+                                        Image.asset(
+                                          ImageConstant.emptyImage,
+                                          height: 120,
+                                          width: 120,
+                                        ),
+                                        Text(
+                                          'Create new task with swipe down',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              color:
+                                                  Theme.of(context).hintColor,
+                                              fontSize: 14),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                            const SizedBox(
+                              height: 16,
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

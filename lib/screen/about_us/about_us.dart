@@ -25,8 +25,8 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
       appBar: AppBar(
         title: const Text("About Us"),
         actions: [
-          PrimaryButton(text: "Buy me coffee", onPressed: (){
-            launchUrl(Uri.parse("https://paypal.me/ssalphax"));
+          PrimaryButton(text: "Share", onPressed: (){
+            launchUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.devlopertechie.karyam"));
           })
         ],
         elevation: 12,
@@ -46,7 +46,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   height: 24,
                 ),
                 const Text(
-                  "This Karyam App is Open Source Project.\nFor this app we are not storing any kind of users information. This app totally works on offline mode, which means each and everything you do, will store in your device\n\nIf this project help you anytime or you think this app make little bit impact on your day to day life you can buy coffee for me...",
+                  "This Karyam App is Open Source Project.\nFor this app we are not storing any kind of users information. This app totally works on offline mode, which means each and everything you do, will store in your device\n\nIf this project help you anytime or you think this app make little bit impact on your day to day life please share this app as many as to your friends.\n\n In future we are adding more features in this app.",
                   style: TextStyle(fontSize: 16),
                 )
               ],
