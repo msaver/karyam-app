@@ -54,7 +54,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
             Row(
               children: [
                 PrimaryButton(text: "New Feature Request", onPressed: (){
-                  launchUrl(Uri.parse("https://github.com/msaver/karyam-app/issues/new"));
+                  launchUrl(Uri.parse("https://forms.gle/gtk7WYWM2XYYCrhL7"));
                 }),
 
               ],
