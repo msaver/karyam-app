@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:karyam/widget/primary_button.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutUsScreen extends StatefulWidget {
@@ -26,7 +27,8 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
         title: const Text("About Us"),
         actions: [
           PrimaryButton(text: "Share", onPressed: (){
-            launchUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.devlopertechie.karyam"));
+            Share.share('https://play.google.com/store/apps/details?id=com.devlopertechie.karyam');
+            // launchUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.devlopertechie.karyam"));
           })
         ],
         elevation: 12,
@@ -54,7 +56,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
             Row(
               children: [
                 PrimaryButton(text: "New Feature Request", onPressed: (){
-                  launchUrl(Uri.parse("https://forms.gle/gtk7WYWM2XYYCrhL7"));
+                  launchUrl(Uri.parse("https://forms.gle/gtk7WYWM2XYYCrhL7"), mode: LaunchMode.externalApplication);
                 }),
 
               ],
