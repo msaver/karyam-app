@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:karyam/constant/image_constant.dart';
-import 'package:karyam/enums/enums.dart';
 import 'package:karyam/screen/home/viewmodel/home_viewmodel.dart';
-import 'package:karyam/util/app_utils.dart';
 import 'package:karyam/widget/category_item_widget.dart';
+import 'package:karyam/widget/category_listing_horizontal_widget.dart';
+import 'package:karyam/widget/chip_widget.dart';
 import 'package:karyam/widget/create_category_item_widget.dart';
+import 'package:karyam/widget/date_filter_widget.dart';
 import 'package:karyam/widget/new_task_widget.dart';
+import 'package:karyam/widget/task_listing_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:upgrader/upgrader.dart';
 
@@ -20,7 +22,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final GlobalKey _filterKey = GlobalKey();
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _controller = ScrollController();
   HomeViewModel homeViewModel = HomeViewModel();
@@ -57,8 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   context.go("/home/about");
                 },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
                   child: Icon(Icons.info_outline),
                 ),
               )
@@ -111,276 +112,23 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             SizedBox(
                               height: MediaQuery.of(context).size.height * 0.14,
-                              child: ListView.builder(
-                                controller: _controller,
-                                itemCount: model.categories.length,
-                                shrinkWrap: true,
-                                scrollDirection: Axis.horizontal,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 4.0, right: 4.0),
-                                    child: Card(
-                                      borderOnForeground: false,
-                                      shape: RoundedRectangleBorder(
-                                        side: BorderSide(
-                                            color: model.selectedCategory
-                                                        .name ==
-                                                    model.categories[index].name
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
-                                                : Colors.transparent),
-                                        borderRadius: const BorderRadius.all(
-                                          Radius.circular(12),
-                                        ),
-                                      ),
-                                      child: InkWell(
-                                        onTap: () {
-                                          model.updateSelectedCategory(
-                                              model.categories[index]);
-                                        },
-                                        child: SizedBox(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.14,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.5,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 16.0,
-                                                right: 16,
-                                                top: 8.0,
-                                                bottom: 8.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  '${model.categories[index].pendingCount} Task',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Theme.of(context)
-                                                          .hintColor,
-                                                      fontSize: 14),
-                                                ),
-                                                Text(
-                                                  model.categories[index].name,
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      fontSize: 20),
-                                                ),
-                                                const SizedBox(height: 12),
-                                                LinearProgressIndicator(
-                                                  value: model.getProgress(
-                                                      model.categories[index]),
-                                                  minHeight: 2,
-                                                  color: Color(model
-                                                      .categories[index]
-                                                      .colorCode),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
+                              child:
+                                  CategoryListingHorizontalWidget(model: model),
                             ),
                             const SizedBox(
                               height: 16,
                             ),
                             Align(
                               alignment: Alignment.centerRight,
-                              child: InkWell(
-                                onTap: () {
-                                  final RenderBox renderBox = _filterKey
-                                      .currentContext
-                                      ?.findRenderObject() as RenderBox;
-                                  final Size size = renderBox.size;
-                                  final Offset offset =
-                                      renderBox.localToGlobal(Offset.zero);
-                                  showMenu(
-                                      context: context,
-                                      position: RelativeRect.fromLTRB(
-                                          offset.dx,
-                                          offset.dy + size.height,
-                                          offset.dx + size.width,
-                                          offset.dy + size.height),
-                                      elevation: 4,
-                                      items: [
-                                        PopupMenuItem(
-                                          child: const Text("None"),
-                                          onTap: () {
-                                            model.applyFilter(ApplyFilter.none);
-                                          },
-                                        ),
-                                        PopupMenuItem(
-                                            child: const Text("Today"),
-                                            onTap: () {
-                                              model.applyFilter(
-                                                  ApplyFilter.today);
-                                            }),
-                                        PopupMenuItem(
-                                          child: const Text("Tomorrow"),
-                                          onTap: () {
-                                            model.applyFilter(
-                                                ApplyFilter.tomorrow);
-                                          },
-                                        ),
-                                        PopupMenuItem(
-                                          child: const Text("Over Due"),
-                                          onTap: () {
-                                            model.applyFilter(
-                                                ApplyFilter.overdue);
-                                          },
-                                        ),
-                                        PopupMenuItem(
-                                          child: const Text("Custom Day"),
-                                          onTap: () async {
-                                            Future.delayed(Duration.zero,
-                                                () async {
-                                              DateTime? dateTime =
-                                                  await showDatePicker(
-                                                      initialEntryMode:
-                                                          DatePickerEntryMode
-                                                              .calendarOnly,
-                                                      context: context,
-                                                      initialDate:
-                                                          model.filterDate,
-                                                      firstDate: DateTime(2000),
-                                                      lastDate: DateTime(2100));
-                                              if (dateTime != null) {
-                                                model.applyFilter(
-                                                    ApplyFilter.customDate,
-                                                    dateTime: dateTime);
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      ]);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                    right: 16.0,
-                                    left: 4,
-                                    top: 4,
-                                  ),
-                                  child: Icon(
-                                    key: _filterKey,
-                                    Icons.filter_alt,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ),
-                              ),
+                              child: DateFilterWidget(model: model,),
                             ),
                             // SelectDateWidget(),
                             const SizedBox(
                               height: 16,
                             ),
                             model.tasks.isNotEmpty
-                                ? ListView.builder(
-                                    itemCount: model.tasks.length,
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    reverse: true,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 16.0),
-                                        child: Card(
-                                          color:
-                                              !model.tasks[index].isCompleted!
-                                                  ? Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondary
-                                                  : Theme.of(context)
-                                                      .highlightColor,
-                                          elevation: 0,
-                                          child: ListTile(
-                                            leading: Theme(
-                                              data: ThemeData(
-                                                  unselectedWidgetColor: Color(
-                                                      model
-                                                          .tasks[index]
-                                                          .category!
-                                                          .colorCode)),
-                                              child: Transform.scale(
-                                                scale: 1.2,
-                                                child: Checkbox(
-                                                  shape:
-                                                      const RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          8))),
-                                                  activeColor: Color(model
-                                                          .tasks[index]
-                                                          .category!
-                                                          .colorCode)
-                                                      .withOpacity(0.3),
-                                                  checkColor: Colors.white,
-                                                  value: model
-                                                      .tasks[index].isCompleted,
-                                                  onChanged: (bool? value) {
-                                                    model.taskComplete(value!,
-                                                        model.tasks[index]);
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            title: Text(
-                                              model.tasks[index].taskName!,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primary,
-                                                  decoration: model.tasks[index]
-                                                          .isCompleted!
-                                                      ? TextDecoration
-                                                          .lineThrough
-                                                      : TextDecoration.none,
-                                                  fontSize: 16),
-                                            ),
-                                            subtitle: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 4.0),
-                                              child: Row(
-                                                children: [
-                                                  chipsContainer(
-                                                      AppUtils.getValueOfDate(
-                                                          model.tasks[index]
-                                                              .tobeDoneDate!),
-                                                      Theme.of(context)
-                                                          .primaryColor
-                                                          .value),
-                                                  const SizedBox(
-                                                    width: 16,
-                                                  ),
-                                                  chipsContainer(
-                                                      model.tasks[index]
-                                                          .category!.name,
-                                                      model.tasks[index]
-                                                          .category!.colorCode),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                ? TaskListingWidget(
+                                    model: model,
                                   )
                                 : Center(
                                     child: Column(
@@ -424,17 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget chipsContainer(String text, int colorCode) {
-    return Container(
-      padding: const EdgeInsets.only(left: 8, right: 8, bottom: 4, top: 4),
-      decoration: BoxDecoration(
-          color: Color(colorCode),
-          borderRadius: const BorderRadius.all(Radius.circular(12))),
-      child: Text(
-        text,
-        style: const TextStyle(
-            fontWeight: FontWeight.w400, color: Colors.white, fontSize: 12),
-      ),
-    );
+    return ChipWidget(text: text, colorCode: colorCode);
   }
 
   Center buildTextForSwipeDown(BuildContext context) {
@@ -463,27 +201,45 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Consumer<HomeViewModel>(
           builder: (BuildContext context, model, Widget? child) {
             return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 32.0, top: 32),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text("<---- Slide left", style: TextStyle(fontSize: 14),)
+                      ],
+                    ),
+                  ),
+                ),
                 DrawerHeader(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        radius: 32,
-                        child: Text(model.userName![0],
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 1.0,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 32.0, right: 32.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 32,
+                            child: Text(model.userName![0],
+                                style: const TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.w300)),
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          Text(
+                            "Welcome, ${model.userName}",
                             style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w300)),
+                                fontSize: 24, fontWeight: FontWeight.w300),
+                          ),
+                        ],
                       ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      Text(
-                        "Welcome, ${model.userName}",
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.w300),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 Expanded(

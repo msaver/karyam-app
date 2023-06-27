@@ -22,5 +22,7 @@ abstract class DbRepository {
       required int completeTask,
       required Category category});
 
+  void deleteTask({required ObjectId id});
+
   void closeDb();
 }

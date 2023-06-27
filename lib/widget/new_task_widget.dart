@@ -13,8 +13,8 @@ class NewTaskWidget extends StatelessWidget {
 
 
   NewTaskWidget({super.key, Key? key1, required this.categories}) {
-    localCategories.addAll(categories);
-    localCategories.removeAt(0);
+    // localCategories.addAll(categories);
+    // localCategories.removeAt(0);
   }
 
   @override
@@ -28,6 +28,7 @@ class NewTaskWidget extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Consumer<HomeViewModel>(
             builder: (BuildContext context, model, Widget? child) {
+              getAllCategories(model.categories);
               // model.selectedCategoryForCreateTask = localCategories[0];
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +73,7 @@ class NewTaskWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 16,),
+                  const SizedBox(height: 16,),
                   Row(
                     children: [
                       InkWell(
@@ -113,7 +114,7 @@ class NewTaskWidget extends StatelessWidget {
                       const SizedBox(width: 16),
                       InkWell(
                         onTap: () async {
-                          Category category = await showModalBottomSheet(
+                          Category? category = await showModalBottomSheet(
                             context: context,
                             builder: (BuildContext context) {
                               return Column(
@@ -157,7 +158,9 @@ class NewTaskWidget extends StatelessWidget {
                               );
                             },
                           );
-                          model.selectedCategoryForCreateTask = category;
+                          if(category != null){
+                            model.selectedCategoryForCreateTask = category;
+                          }
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -220,7 +223,10 @@ class NewTaskWidget extends StatelessWidget {
     );
   }
 
-  // void showInSnackBar(String value) {
-  //   _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(value)));
-  // }
+  void getAllCategories(List<Category> categories) {
+    localCategories.clear();
+    localCategories.addAll(categories);
+    localCategories.removeAt(0);
+  }
+
 }

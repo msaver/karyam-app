@@ -87,5 +87,12 @@ class DbRepoImpl implements DbRepository {
    _realm!.close();
   }
 
+  @override
+  void deleteTask({required ObjectId id}) {
+    Task task = _realm!.all<Task>().query(r'id == $0', [id]).first;
+
+    _realm!.write(() => _realm!.delete(task));
+  }
+
 
 }

@@ -79,9 +79,8 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void taskComplete(bool value, TaskItem task) {
-    Task taskNewValue = _dbRepoImpl!.taskCompletion(
-        value: value,
-        id: ObjectId.fromHexString(task.id!));
+    Task taskNewValue = _dbRepoImpl!
+        .taskCompletion(value: value, id: ObjectId.fromHexString(task.id!));
     TaskItem item = TaskItem(
         category: taskNewValue.category,
         id: taskNewValue.id.hexString,
@@ -89,7 +88,8 @@ class HomeViewModel extends ChangeNotifier {
         taskName: taskNewValue.taskName,
         createdDate: taskNewValue.createdDate.toLocal(),
         tobeDoneDate: taskNewValue.tobeDoneDate.toLocal());
-    tasks[tasks.indexWhere((element) => element.id == taskNewValue.id.hexString)] = item;
+    tasks[tasks.indexWhere(
+        (element) => element.id == taskNewValue.id.hexString)] = item;
     updateCategoryValues();
     notifyListeners();
   }
@@ -186,7 +186,7 @@ class HomeViewModel extends ChangeNotifier {
       tasks.addAll(items);
     }
 
-    tasks.sort((a,b) => b.tobeDoneDate!.compareTo(a.tobeDoneDate!));
+    tasks.sort((a, b) => b.tobeDoneDate!.compareTo(a.tobeDoneDate!));
 
     notifyListeners();
   }
@@ -240,13 +240,19 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void getUserName() async{
+  void getUserName() async {
     userName = await PreferencesData.getUserName();
     notifyListeners();
-
   }
 
   void closeDb() {
     _dbRepoImpl!.closeDb();
+  }
+
+  void deleteTask(TaskItem task) {
+    _dbRepoImpl!.deleteTask(id:ObjectId.fromHexString(task.id!));
+    getAllTask();
+    updateCategoryValues();
+    notifyListeners();
   }
 }
