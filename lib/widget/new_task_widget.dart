@@ -8,11 +8,12 @@ import 'package:provider/provider.dart';
 class NewTaskWidget extends StatelessWidget {
   // final HomeViewModel model;
   final List<Category> categories;
+  final String? taskId;
   final List<Category> localCategories = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
 
-  NewTaskWidget({super.key, Key? key1, required this.categories}) {
+  NewTaskWidget({super.key, Key? key1, required this.categories, this.taskId}) {
     // localCategories.addAll(categories);
     // localCategories.removeAt(0);
   }
@@ -20,7 +21,7 @@ class NewTaskWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-      value: HomeViewModel(),
+      value: HomeViewModel(taskId: taskId),
       child: Scaffold(
         body: Container(
           height: double.infinity,
@@ -158,7 +159,7 @@ class NewTaskWidget extends StatelessWidget {
                               );
                             },
                           );
-                          if(category != null){
+                          if(category != null) {
                             model.selectedCategoryForCreateTask = category;
                           }
                         },
@@ -197,14 +198,18 @@ class NewTaskWidget extends StatelessWidget {
                         width: double.infinity,
                         height: 54,
                         child: PrimaryButton(
-                          text: "Add Task",
+                          text: taskId != null? "Update Task" :"Add Task",
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              model.addTask(
-                                  model.taskEditingController.text,
-                                  model.selectedCategoryForCreateTask,
-                                  model.selectedDateTime);
-                              FocusManager.instance.primaryFocus?.unfocus();
+                              if(taskId == null) {
+                                model.addTask(
+                                    model.taskEditingController.text,
+                                    model.selectedCategoryForCreateTask,
+                                    model.selectedDateTime);
+                                FocusManager.instance.primaryFocus?.unfocus();
+                              } else {
+                                model.updateTask(taskId!);
+                              }
                               await Future.delayed(
                                   const Duration(milliseconds: 200));
                               Navigator.pop(context);

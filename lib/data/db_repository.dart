@@ -25,4 +25,8 @@ abstract class DbRepository {
   void deleteTask({required ObjectId id});
 
   void closeDb();
+
+  Task getTaskById({required ObjectId id});
+
+  void updateTask({required Task task});
 }

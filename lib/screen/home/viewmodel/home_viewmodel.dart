@@ -18,13 +18,16 @@ class HomeViewModel extends ChangeNotifier {
   ApplyFilter? applyFilterType;
   String? userName;
 
-  HomeViewModel() {
+  HomeViewModel({String? taskId}) {
     _dbRepoImpl = DbRepoImpl();
     getAllCategory();
     getAllTask();
     updateCategoryValues();
     updateSelectedCategory(categories[0]);
     getUserName();
+    if (taskId != null) {
+      getTask(taskId);
+    }
   }
 
   void getAllCategory() {
@@ -59,8 +62,8 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addTask(
-      String taskName, Category selectedCategory, DateTime selectedDateTime) {
+  void addTask(String taskName, Category selectedCategory,
+      DateTime selectedDateTime) {
     _dbRepoImpl!.addNewTask(
         taskName: taskName,
         selectedCategory: selectedCategory,
@@ -89,7 +92,7 @@ class HomeViewModel extends ChangeNotifier {
         createdDate: taskNewValue.createdDate.toLocal(),
         tobeDoneDate: taskNewValue.tobeDoneDate.toLocal());
     tasks[tasks.indexWhere(
-        (element) => element.id == taskNewValue.id.hexString)] = item;
+            (element) => element.id == taskNewValue.id.hexString)] = item;
     updateCategoryValues();
     notifyListeners();
   }
@@ -116,8 +119,8 @@ class HomeViewModel extends ChangeNotifier {
             .length;
         int pendingCount = getAllTaskFromDb()
             .where((taskElement) =>
-                taskElement.isCompleted == false &&
-                taskElement.category!.name == element.name)
+        taskElement.isCompleted == false &&
+            taskElement.category!.name == element.name)
             .length;
         _dbRepoImpl!.updateCountOfTask(
             category: element,
@@ -141,8 +144,8 @@ class HomeViewModel extends ChangeNotifier {
       } else {
         return item.totalCount != null
             ? (item.pendingCount! / item.totalCount!) == 0
-                ? 1
-                : 1 - (item.pendingCount! / item.totalCount!)
+            ? 1
+            : 1 - (item.pendingCount! / item.totalCount!)
             : 0;
       }
     } else {
@@ -167,7 +170,7 @@ class HomeViewModel extends ChangeNotifier {
           getAllTaskFromDb().where((element) => element.isCompleted == false));
     } else {
       items.addAll(getAllTaskFromDb().where((element) =>
-          element.isCompleted == false &&
+      element.isCompleted == false &&
           element.category!.name == selectedCategory.name));
     }
 
@@ -250,9 +253,25 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void deleteTask(TaskItem task) {
-    _dbRepoImpl!.deleteTask(id:ObjectId.fromHexString(task.id!));
+    _dbRepoImpl!.deleteTask(id: ObjectId.fromHexString(task.id!));
     getAllTask();
     updateCategoryValues();
     notifyListeners();
+  }
+
+  void getTask(String taskId) {
+    Task task = _dbRepoImpl!.getTaskById(id: ObjectId.fromHexString(taskId));
+    taskEditingController.text = task.taskName;
+    selectedCategoryForCreateTask = task.category!;
+    // print(task.tobeDoneDate.toLocal());
+    selectedDateTime = task.tobeDoneDate.toLocal();
+    // notifyListeners();
+  }
+
+  void updateTask(String taskId) {
+    Task task = _dbRepoImpl!.getTaskById(id: ObjectId.fromHexString(taskId));
+    _dbRepoImpl!.updateTask(task: Task(
+        ObjectId.fromHexString(taskId), taskEditingController.text, task.createdDate,
+        selectedDateTime.toUtc(), category: selectedCategoryForCreateTask));
   }
 }

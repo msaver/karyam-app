@@ -94,5 +94,17 @@ class DbRepoImpl implements DbRepository {
     _realm!.write(() => _realm!.delete(task));
   }
 
+  @override
+  Task getTaskById({required ObjectId id}) {
+    Task task = _realm!.all<Task>().query(r'id == $0', [id]).first;
+    return task;
+  }
+
+  @override
+  void updateTask({required Task task}) {
+    _realm!.write(() {
+      _realm!.add(task, update: true);
+    });
+  }
 
 }

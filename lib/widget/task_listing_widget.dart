@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:karyam/screen/home/viewmodel/home_viewmodel.dart';
 import 'package:karyam/util/app_utils.dart';
 import 'package:karyam/widget/chip_widget.dart';
+import 'package:karyam/widget/new_task_widget.dart';
 
 class TaskListingWidget extends StatelessWidget {
   final HomeViewModel model;
@@ -30,7 +31,19 @@ class TaskListingWidget extends StatelessWidget {
               label: 'Delete',
             ),
             SlidableAction(
-              onPressed: (context){},
+              onPressed: (context) async {
+                await Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (_, __, ___) =>
+                        NewTaskWidget(categories: model.categories, taskId: model.tasks[index].id),
+                    transitionDuration: const Duration(milliseconds: 200),
+                    transitionsBuilder: (_, a, __, c) =>
+                        FadeTransition(opacity: a, child: c),
+                  ),
+                );
+                model.updateTasks();
+              },
               backgroundColor: Theme.of(context).colorScheme.background,
               foregroundColor: Theme.of(context).colorScheme.primary,
               icon: Icons.edit,
