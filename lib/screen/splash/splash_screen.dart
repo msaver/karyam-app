@@ -13,7 +13,6 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-
     super.initState();
   }
 
@@ -24,7 +23,10 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: Text(
           "Karyam",
-          style: TextStyle(fontSize: 64, fontWeight: FontWeight.w200, color: Theme.of(context).colorScheme.primary),
+          style: TextStyle(
+              fontSize: 64,
+              fontWeight: FontWeight.w200,
+              color: Theme.of(context).colorScheme.primary),
         ),
       ),
     );

@@ -3,8 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:karyam/constant/string_constant.dart';
 import 'package:karyam/data/preference/preferences_data.dart';
 
-class SetupProfileViewModel extends ChangeNotifier{
-
+class SetupProfileViewModel extends ChangeNotifier {
   final TextEditingController nameController = TextEditingController();
 
   SetupProfileViewModel();
@@ -13,5 +12,4 @@ class SetupProfileViewModel extends ChangeNotifier{
     PreferencesData.setUserName(userName: nameController.text);
     context.go(StringConstant.home);
   }
-
 }

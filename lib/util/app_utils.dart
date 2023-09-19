@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-class AppUtils{
+class AppUtils {
   static String getValueOfDate(DateTime dateTime) {
     DateTime date = DateTime(dateTime.year, dateTime.month, dateTime.day);
     if (date ==

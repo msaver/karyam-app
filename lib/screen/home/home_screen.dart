@@ -120,7 +120,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             Align(
                               alignment: Alignment.centerRight,
-                              child: DateFilterWidget(model: model,),
+                              child: DateFilterWidget(
+                                model: model,
+                              ),
                             ),
                             // SelectDateWidget(),
                             const SizedBox(
@@ -210,7 +212,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text("<---- Slide left", style: TextStyle(fontSize: 14),)
+                        Text(
+                          "<---- Slide left",
+                          style: TextStyle(fontSize: 14),
+                        )
                       ],
                     ),
                   ),

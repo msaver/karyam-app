@@ -7,13 +7,16 @@ class CategoryItemWidget extends StatelessWidget {
   final Function(Category) onCategorySelected;
 
   const CategoryItemWidget(
-      {Key? key, required this.isSelected, required this.category, required this.onCategorySelected})
+      {Key? key,
+      required this.isSelected,
+      required this.category,
+      required this.onCategorySelected})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         onCategorySelected.call(category);
       },
       child: Container(

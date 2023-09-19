@@ -12,7 +12,6 @@ class NewTaskWidget extends StatelessWidget {
   final List<Category> localCategories = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-
   NewTaskWidget({super.key, Key? key1, required this.categories, this.taskId}) {
     // localCategories.addAll(categories);
     // localCategories.removeAt(0);
@@ -59,8 +58,9 @@ class NewTaskWidget extends StatelessWidget {
                       child: TextFormField(
                         controller: model.taskEditingController,
                         style: const TextStyle(fontSize: 24.0),
-                        validator: (value) =>
-                        value!.trim().isEmpty ? 'Please enter task here' : null,
+                        validator: (value) => value!.trim().isEmpty
+                            ? 'Please enter task here'
+                            : null,
                         maxLines: 2,
                         decoration: const InputDecoration(
                           contentPadding:
@@ -74,7 +74,9 @@ class NewTaskWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16,),
+                  const SizedBox(
+                    height: 16,
+                  ),
                   Row(
                     children: [
                       InkWell(
@@ -159,7 +161,7 @@ class NewTaskWidget extends StatelessWidget {
                               );
                             },
                           );
-                          if(category != null) {
+                          if (category != null) {
                             model.selectedCategoryForCreateTask = category;
                           }
                         },
@@ -198,10 +200,10 @@ class NewTaskWidget extends StatelessWidget {
                         width: double.infinity,
                         height: 54,
                         child: PrimaryButton(
-                          text: taskId != null? "Update Task" :"Add Task",
+                          text: taskId != null ? "Update Task" : "Add Task",
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              if(taskId == null) {
+                              if (taskId == null) {
                                 model.addTask(
                                     model.taskEditingController.text,
                                     model.selectedCategoryForCreateTask,
@@ -233,5 +235,4 @@ class NewTaskWidget extends StatelessWidget {
     localCategories.addAll(categories);
     localCategories.removeAt(0);
   }
-
 }

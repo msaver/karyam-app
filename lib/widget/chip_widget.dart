@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 class ChipWidget extends StatelessWidget {
   final String text;
   final int colorCode;
-  const ChipWidget({Key? key, required this.text, required this.colorCode}) : super(key: key);
+
+  const ChipWidget({Key? key, required this.text, required this.colorCode})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

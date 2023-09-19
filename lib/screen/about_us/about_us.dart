@@ -26,10 +26,13 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
       appBar: AppBar(
         title: const Text("About Us"),
         actions: [
-          PrimaryButton(text: "Share", onPressed: (){
-            Share.share('https://play.google.com/store/apps/details?id=com.devlopertechie.karyam');
-            // launchUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.devlopertechie.karyam"));
-          })
+          PrimaryButton(
+              text: "Share",
+              onPressed: () {
+                Share.share(
+                    'https://play.google.com/store/apps/details?id=com.devlopertechie.karyam');
+                // launchUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.devlopertechie.karyam"));
+              })
         ],
         elevation: 12,
       ),
@@ -55,10 +58,13 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
             ),
             Row(
               children: [
-                PrimaryButton(text: "New Feature Request", onPressed: (){
-                  launchUrl(Uri.parse("https://forms.gle/gtk7WYWM2XYYCrhL7"), mode: LaunchMode.externalApplication);
-                }),
-
+                PrimaryButton(
+                    text: "New Feature Request",
+                    onPressed: () {
+                      launchUrl(
+                          Uri.parse("https://forms.gle/gtk7WYWM2XYYCrhL7"),
+                          mode: LaunchMode.externalApplication);
+                    }),
               ],
             )
           ],

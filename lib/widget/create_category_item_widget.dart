@@ -4,7 +4,9 @@ import 'package:karyam/screen/home/viewmodel/home_viewmodel.dart';
 
 class CreateCategoryItemWidget extends StatefulWidget {
   final HomeViewModel model;
-  const CreateCategoryItemWidget(this.model, {
+
+  const CreateCategoryItemWidget(
+    this.model, {
     Key? key,
   }) : super(key: key);
 
@@ -54,18 +56,18 @@ class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
     );
   }
 
-  Widget createNewItemField(){
-    return  Row(
+  Widget createNewItemField() {
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           padding: const EdgeInsets.only(left: 4, right: 4, top: 2, bottom: 2),
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(Radius.circular(8)),
-          color: Theme.of(context).primaryColorLight,
+            color: Theme.of(context).primaryColorLight,
           ),
           child: InkWell(
-            onTap: (){
+            onTap: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -75,7 +77,7 @@ class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
                     content: SingleChildScrollView(
                       child: MaterialPicker(
                         pickerColor: Colors.black,
-                        onColorChanged: (value){
+                        onColorChanged: (value) {
                           Navigator.pop(context);
                           setState(() {
                             selectedColor = value;
@@ -111,8 +113,9 @@ class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
           child: TextFormField(
             textInputAction: TextInputAction.done,
             controller: categoryEditingController,
-            onEditingComplete: (){
-              widget.model.addNewCategory(categoryEditingController.text, selectedColor);
+            onEditingComplete: () {
+              widget.model.addNewCategory(
+                  categoryEditingController.text, selectedColor);
               setState(() {
                 isNewItemCreate = false;
               });
@@ -126,6 +129,4 @@ class _CreateCategoryItemWidgetState extends State<CreateCategoryItemWidget> {
       ],
     );
   }
-
-
 }

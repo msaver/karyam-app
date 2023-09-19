@@ -11,7 +11,6 @@ class SetupProfileScreen extends StatefulWidget {
 }
 
 class _SetupProfileScreenState extends State<SetupProfileScreen> {
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -52,7 +51,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   controller: model.nameController,
                   validator: (value) =>
-                  value!.isEmpty ? 'Please Enter Name' : null,
+                      value!.isEmpty ? 'Please Enter Name' : null,
                   style: const TextStyle(fontSize: 24.0),
                   maxLines: 1,
                   decoration: const InputDecoration(
@@ -72,11 +71,13 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: PrimaryButton(text: "Next", onPressed: () {
-                if(_formKey.currentState!.validate()){
-                  model.updateName(context);
-                }
-              }),
+              child: PrimaryButton(
+                  text: "Next",
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      model.updateName(context);
+                    }
+                  }),
             )
           ],
         );

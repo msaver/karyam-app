@@ -7,7 +7,7 @@ import 'package:karyam/routes/routes.dart';
 
 import 'color_schemes.g.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
